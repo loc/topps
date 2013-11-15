@@ -19,5 +19,6 @@ And make sure you create your own the config/db.py with your username and passwo
 
 ```
 cp config/db.py.sample config/db.py
-emacs config.py
+emacs config/db.py
 ```
+And do the same for the app.py.sample.

@@ -1,2 +1,2 @@
 # application wide config variables
-SECRET_KEY = "abc"
+SECRET_KEY = "\x03|\x13\xe3F\xe3\xa1!B\xc4e\x88\xfd\xf6qR F\x87\xa1\x8fV\x0f]"
