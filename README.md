@@ -2,3 +2,22 @@ topps
 =====
 
 badass football card trading app
+
+
+To get started
+--------------
+
+```
+pip install -r requirements.txt
+```
+
+```
+python app.py
+```
+
+And make sure you create your own the config/db.py with your username and password
+
+```
+cp config/db.py.sample config/db.py
+emacs config.py
+```

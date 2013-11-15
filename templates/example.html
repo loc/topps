@@ -1,0 +1,10 @@
+{% if user %}
+	<span>{{user}}</span><br>
+{% endif %}
+
+{% for row in rows %}
+	{% for column in row %}
+		<span>{{column}}</span>
+	{% endfor %}
+	<br>
+{% endfor %}

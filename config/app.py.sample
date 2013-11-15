@@ -1,0 +1,2 @@
+# application wide config variables
+SECRET_KEY = "abc"
