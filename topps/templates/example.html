@@ -1,0 +1,8 @@
+{% if user %}
+	<span>{{ user }}</span><br>
+{% endif %}
+
+{% for row in rows %}
+	<span>{{row["email"]}}</span>
+	<br>
+{% endfor %}

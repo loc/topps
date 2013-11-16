@@ -12,7 +12,7 @@ pip install -r requirements.txt
 ```
 
 ```
-python app.py
+python server.py
 ```
 
 And make sure you create your own the config/db.py with your username and password
