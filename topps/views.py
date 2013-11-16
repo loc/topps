@@ -7,7 +7,7 @@ from MySQLdb import escape_string as escape
 @app.before_request
 def before_request():
     g.db = connect_db()
-    g.user = session['username'] if 'username' in session else None
+    g.user = session['user'] if 'user' in session else None
 
 @app.teardown_request
 def teardown_request(exception):
@@ -41,7 +41,15 @@ def login():
         results = cur.fetchall()
         print results
         if len(results) == 1:
-            session['username'] = str(results[0]["id"])
+            session['user'] = str(results[0]["id"])
             return redirect(redirect_url())
         # error("couldn't log you in")
     return render_template("login.html")
+
+
+@app.route('/logout')
+def logout():
+    if g.user is None:
+        return redirect(url_for('login'))
+    session.pop("user")
+    return redirect(url_for('index'))
