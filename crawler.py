@@ -8,8 +8,6 @@ from topps import app
 from math import floor
 from topps import util
 
-app.config.from_object('topps.config.db')
-
 db = util.connect_db()
 
 cursor = db.cursor()
