@@ -1,0 +1,16 @@
+Zack's ideas for how trades could work:
+
+Two users involved in trade:
+
+user one initiates a trade by sending an offer to user two - could send like a fb notification kind of message with the cards being offered as well as a list of the cards desired (everyone's collections are public)
+
+
+user two can either accept user one's trade by sending back the cards they are willing to offer for the trade, or reject the trade outright
+
+user one can confirm user two's trade counteroffer and the trade will go through. Otherwise, user one can reject the counteroffer and the trade dies
+
+Done!
+
+Also, we were talking about have some point system to be able to buy cards? Say users generate 1pt/sec online, and they can buy a card for 10 pts - something along those lines?
+
+
