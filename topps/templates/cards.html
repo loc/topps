@@ -1,0 +1,187 @@
+<style>
+body {
+	background: #292929;
+}
+.card
+{
+width: 300px;
+height: 400px;
+font-family: sans-serif;
+-moz-border-radius: 9px;
+border-radius: 9px;
+position: relative;
+
+box-shadow: 0 2px 3px rgba(0,0,0,.4);
+}
+
+.card:before {
+	content: "";
+	position: absolute;
+	box-shadow: inset 0 1px 1px rgba(255,255,255,.6);
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 9px;
+	z-index: 10;
+	pointer-events: none;
+}
+
+
+.side {
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	border-radius: 9px;
+	overflow: hidden;
+}
+
+.card.img{
+width: 100%;
+height: 100%;
+}
+.front
+{
+background: url('http://www.mockdrafthq.com/wp-content/uploads/2012/06/Favre.jpg') no-repeat;
+background-size: cover;
+}
+.caption
+{
+ position: absolute; 
+ bottom: 0;
+ background: rgba(0,0,0,.6);
+ color: white;
+ height: 50px;
+ margin-left: auto ;
+ margin-right: auto ;
+ width: 100%;
+height: 60px;
+padding: 10px 15px;
+box-sizing: border-box;
+
+}
+.front .title
+{
+font-weight: bold;
+}
+.front .subtitle
+{
+font-style: italic;
+display: block;
+font-weight: 100;
+margin-top: 3px;
+}
+.flip {
+position: absolute;
+right: 20px;
+bottom: 20px;
+font-style: italic;
+}
+	.front .flip {
+		color: white;
+	}
+.back
+{
+background-color: #dadada;
+}
+.back .heading
+{
+height: 100px;
+width: 300px;
+padding-top: 20px;
+color: #2F4F4F;
+}
+.back .image-box
+{
+background: url('https://pbs.twimg.com/profile_images/2190928240/8991882-large.jpeg') no-repeat;
+width: 75px;
+height:75px;
+-moz-border-radius: 7px;
+border-radius: 7px;
+margin-left: 4px;
+padding-top: 3px;
+}
+.back .title
+{
+position: absolute
+padding-top: 200px;
+line-height: 3em;
+font-weight: bold;
+font-size: 20px;
+}
+.back .subtitle
+{
+position: absolute
+font-style: italic;
+font-size: 10px;
+}
+.back .stats
+{
+width:300px;
+height:250px;
+}
+
+/* css transitions */
+
+.card {
+	transition: 0.6s;
+	-webkit-transform-style: preserve-3d;
+	-moz-transform-style: preserve-3d;
+	-ms-transform-style: preserve-3d;
+}
+
+.flipped {
+	-webkit-transform: rotateY(180deg);	
+	-moz-transform: rotateY(180deg);	
+	-ms-transform: rotateY(180deg);	
+}
+
+.side {	
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility:    hidden;
+	-ms-backface-visibility:     hidden;
+
+	-webkit-transform: translate3d(0,0,0);
+}
+
+.back {
+	-webkit-transform: rotateY(180deg);
+	-moz-transform: rotateY(180deg);
+	-ms-transform: rotateY(180deg);
+}
+</style>
+
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script>
+$(function() {
+	$('.flip').on("click", function(e) {
+		console.log("hellow");
+		$(this).parents(".card").toggleClass("flipped");
+	})
+})
+</script>
+
+<div class="card">
+	<div class="side front">
+		<div class="caption">
+			<span class="title">Brett Favre</span>
+			<span class="subtitle">Green Bay Packers</span>
+		</div>
+		<span class="flip">flip</span>
+	</div>
+
+	<div class="side back">
+		<div class="heading">
+			<img class="image-box">
+			<span class="title">Brett Favre</span>
+			<span class="subtitle">@brettfavrewhatever</span>
+		</div>
+		<div class="stats">
+			STATS GO HERE
+		</div>
+		<span class="flip">flip</span>
+
+	</div>
+</div>

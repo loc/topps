@@ -53,3 +53,7 @@ def logout():
         return redirect(url_for('login'))
     session.pop("user")
     return redirect(url_for('index'))
+
+@app.route('/cards')
+def cards():
+    return render_template("cards.html")
