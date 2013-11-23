@@ -1,3 +1,4 @@
+<!doctype html>
 <style>
 body {
 	background: #292929;
@@ -44,7 +45,7 @@ height: 100%;
 }
 .front
 {
-background: url('http://www.mockdrafthq.com/wp-content/uploads/2012/06/Favre.jpg') no-repeat;
+background: url({{image_url}}) no-repeat;
 background-size: cover;
 }
 .caption
@@ -95,7 +96,7 @@ color: #2F4F4F;
 }
 .back .image-box
 {
-background: url('https://pbs.twimg.com/profile_images/2190928240/8991882-large.jpeg') no-repeat;
+background: url({{image_url}}) no-repeat;
 width: 75px;
 height:75px;
 -moz-border-radius: 7px;
@@ -162,12 +163,13 @@ $(function() {
 	})
 })
 </script>
-
+<h1>  {{ card_id }} {{first_name}} {{last_name}} {{number}} {{image_url}} {{position}} {{team_name}} </h1>
 <div class="card">
 	<div class="side front">
 		<div class="caption">
-			<span class="title">Brett Favre</span>
-			<span class="subtitle">Green Bay Packers</span>
+			<span class="title">{{first_name}} {{last_name}}</span>
+			<span class="subtitle">{{team_name}}</span>
+			<span class="subtitle">{{position}}</span>
 		</div>
 		<span class="flip">flip</span>
 	</div>
@@ -175,11 +177,12 @@ $(function() {
 	<div class="side back">
 		<div class="heading">
 			<img class="image-box">
-			<span class="title">Brett Favre</span>
-			<span class="subtitle">@brettfavrewhatever</span>
+			<div class="title">{{first_name}} {{last_name}}</div>
+			<div class="subtitle">{{team_name}}</div>
 		</div>
 		<div class="stats">
-			STATS GO HERE
+			Number: {{number}}
+			Position: {{position}}
 		</div>
 		<span class="flip">flip</span>
 

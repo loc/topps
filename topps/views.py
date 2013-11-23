@@ -2,6 +2,7 @@ from topps import app
 from flask import Flask, request, session, g, render_template, redirect, url_for
 from stmts import stmts as sql
 from util import *
+import urllib
 from MySQLdb import escape_string as escape
 
 @app.before_request
@@ -54,6 +55,19 @@ def logout():
     session.pop("user")
     return redirect(url_for('index'))
 
-@app.route('/cards')
-def cards():
-    return render_template("cards.html")
+@app.route('/card/<card_id>')
+def card(card_id):
+        cur = g.db.cursor()
+        cur.execute(sql.populate_card(card_id))
+        results = cur.fetchall()
+	print results
+	first_name=results[0]['first_name']
+	last_name=results[0]['last_name']
+	number=results[0]['number']
+	if results[0]['image_url'] is not None:
+		image_url=urllib.unquote(results[0]['image_url'])
+	else:
+		image_url="http://blog.escapecreative.com/wp-content/themes/patus/images/no-image-half-landscape.png"
+	position=results[0]['position']
+	team_name=results[0]['team_name']	
+    	return render_template("cards.html",card_id=card_id, first_name=first_name, last_name=last_name, number=number, image_url=image_url, position=position, team_name=team_name)
