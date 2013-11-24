@@ -71,3 +71,117 @@ def card(card_id):
 	position=results[0]['position']
 	team_name=results[0]['team_name']	
     	return render_template("cards.html",card_id=card_id, first_name=first_name, last_name=last_name, number=number, image_url=image_url, position=position, team_name=team_name)
+
+@app.route('/trade/<user_id_1>/<user_id_2>/initiate', methods=['GET', 'POST'])
+def initiate_trade(user_id_1, user_id_2):
+	cur = g.db.cursor()
+
+	#check and make sure there are no previously unresolved trades between the two parties
+	cur.execute(sql.check_trades(user_id_1, user_id_2))
+	results = cur.fetchall()
+	if len(results) != 0:
+		return render_template("status.html", status_text="trade has already been initiated")
+	cur.execute(sql.check_trades(user_id_2, user_id_1))
+	results = cur.fetchall()
+	if len(results) != 0:
+		return render_template("status.html", status_text="trade has already been initiated")
+	
+	#initiate a trade in the trade table
+	cur.execute(sql.initiate_trade(user_id_1,user_id_2))
+	g.db.commit()
+    	return render_template("status.html", status_text="trade initiated")
+
+@app.route('/trade/<user_id_1>/<user_id_2>/accept', methods=['GET', 'POST'])
+def accept_trade(user_id_1, user_id_2):
+	cur = g.db.cursor()
+
+	#check and make sure a trade has previously been initiated between the two parties
+	cur.execute(sql.check_trades(user_id_1, user_id_2))
+	results = cur.fetchall()
+	print len(results)
+	if len(results) != 1:
+		return render_template("status.html", status_text="trade has not been initiated")
+
+	#check and make sure that the initiated trade has not been accepted or confirmed yet
+	if results[0]['accepted_at'] is not None:
+		return render_template("status.html", status_text="trade has already been accepted")
+	if results[0]['confirmed_at'] is not None:
+		return render_template("status.html", status_text="trade has already been confirmed")
+	cur.execute(sql.accept_trade(user_id_1,user_id_2))
+	g.db.commit()
+    	return render_template("status.html", status_text="trade accepted")
+
+@app.route('/trade/<user_id_1>/<user_id_2>/confirm', methods=['GET', 'POST'])
+def confirm_trade(user_id_1, user_id_2):
+	cur = g.db.cursor()
+
+	#check and make sure a trade has both been initiated and accepted between the two parties
+	cur.execute(sql.check_trades(user_id_1, user_id_2))
+	results = cur.fetchall()
+	if len(results) != 1:
+		return render_template("status.html", status_text="trade has not been initiated")
+	
+	#check acceptance
+	if results[0]['accepted_at'] is None:
+		return render_template("status.html", status_text="trade has not been accepted")
+	#check confirmation
+	if results[0]['confirmed_at'] is not None:
+		return render_template("status.html", status_text="trade has already been confirmed")
+
+
+	cur.execute(sql.confirm_trade(user_id_1,user_id_2))
+	g.db.commit()
+    	return render_template("status.html", status_text="trade confirmed")
+
+@app.route('/trade/<user_id_1>/<user_id_2>/perform', methods=['GET', 'POST'])
+def perform_trade(user_id_1, user_id_2):
+	cur = g.db.cursor()
+
+	#check and make sure trade has been initiated, accepted, and confirmed
+	#initiated
+	cur.execute(sql.check_trades(user_id_1, user_id_2))
+	results = cur.fetchall()
+	if len(results) != 1:
+		return render_template("status.html", status_text="trade has not been initiated")
+	if results[0]['accepted_at'] is None:
+		return render_template("status.html", status_text="trade has not been accepted")
+	if results[0]['confirmed_at'] is None:
+		return render_template("status.html", status_text="trade has not been confirmed")
+
+	if request.method == 'POST':
+		#post card ID's of each card that user1 and user2 have confirmed to trade
+        	user1_cards = escape(request.form['user1_cards'])
+        	user2_cards = escape(request.form['user2_cards'])
+		user1_cards = user1_cards.split()
+		user2_cards = user2_cards.split()
+		for id in user1_cards:
+			print id
+			cur.execute(sql.select_card(id))
+			results = cur.fetchall()
+			print results[0]['current_owner_id']
+			print id
+			print user_id_2
+			cur.execute(sql.trade_card(id, user_id_2))
+			g.db.commit()
+		for id in user2_cards:
+			print id
+			cur.execute(sql.select_card(id))
+			results = cur.fetchall()
+			print results[0]['current_owner_id']
+			print id
+			print user_id_2
+			cur.execute(sql.trade_card(id, user_id_1))
+			g.db.commit()
+			
+
+    	return render_template("status.html", status_text="trade performed")
+
+@app.route('/trade/<user_id_1>/<user_id_2>/cancel', methods=['GET', 'POST'])
+def cancel_trade(user_id_1, user_id_2):
+	cur = g.db.cursor()
+	cur.execute(sql.cancel_trade(user_id_1,user_id_2))
+	g.db.commit()
+    	return render_template("status.html", status_text="trade canceled")
+
+
+
