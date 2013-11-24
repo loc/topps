@@ -43,5 +43,14 @@ def check_trades(user_id_1, user_id_2):
 	print stmt
 	return stmt
 
+def insert_trade_cards(trade_id, card_id, from_id, desired):
+	stmt = "INSERT INTO `trade cards` (`trade_id` ,`card_id` ,`from_id` ,`desired`)VALUES ({0}, {1}, {2}, {3})".format(trade_id, card_id, from_id, desired)
+	print stmt
+	return stmt
+
+def select_trade_cards(trade_id):
+	stmt = "SELECT * FROM `trade cards` WHERE trade_id={0}".format(trade_id)
+	print stmt
+	return stmt
 
 
