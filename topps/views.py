@@ -3,7 +3,7 @@ from flask import Flask, request, session, g, render_template, redirect, url_for
 from stmts import stmts as sql
 from util import *
 from MySQLdb import escape_string as escape
-import time
+from datetime import datetime
 
 @app.before_request
 def before_request():
@@ -11,14 +11,15 @@ def before_request():
     g.user = session['user'] if 'user' in session else None
     if g.user:
         cur = g.db.cursor()
-        cur.execute(sql.get_user(g.user))
+        cur.execute(sql.get_user(), (int(g.user),))
         user = cur.fetchone()
         if user:
-            (user_id, email, full_name, password_md5, last_points_given_at, points) = user
-            now = time.time()
-            extra_points = extra_points_for_active(now, int(last_points_given_at))
-            cur = g.db.cursor()
-            cur.execute(sql.after_login(user_id, now, extra_points))
+            last_points_given_at = user["last_points_given_at"] or datetime.now()
+            now = datetime.now()
+            extra_points = extra_points_for_active(now, last_points_given_at)
+            if extra_points > 0:
+                cur = g.db.cursor()
+                cur.execute(sql.after_login(), (extra_points, int(g.user)))
 
 @app.teardown_request
 def teardown_request(exception):
@@ -34,7 +35,7 @@ def secret():
 @app.route('/')
 def index():
     cur = g.db.cursor()
-    cur.execute(sql.get_user(g.user))
+    cur.execute(sql.get_user(), (g.user))
     user = cur.fetchone()
     
     cur = g.db.cursor()

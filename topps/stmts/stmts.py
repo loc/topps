@@ -3,12 +3,12 @@ def login(email, password):
 	print stmt
 	return stmt
 
-def get_user(user_id):
-	stmt = "SELECT * FROM users WHERE id={0} LIMIT 1;".format(user_id)
+def get_user():
+	stmt = "SELECT * FROM users WHERE id=%s LIMIT 1;"
 	print stmt
 	return stmt
 
-def after_login(id, current_ts, extra_points):
-    stmt = "UPDATE users SET last_points_given_at={1}, points = points + {2} WHERE id = {0};".format(id, current_ts, extra_points)
+def after_login():
+    stmt = "UPDATE users SET last_points_given_at=CURRENT_TIMESTAMP, points = points + %s WHERE id = %s;"
     print stmt
     return stmt
