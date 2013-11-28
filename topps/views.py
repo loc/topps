@@ -4,11 +4,23 @@ from stmts import stmts as sql
 from util import *
 import urllib
 from MySQLdb import escape_string as escape
+from datetime import datetime
 
 @app.before_request
 def before_request():
     g.db = connect_db()
     g.user = session['user'] if 'user' in session else None
+    if g.user:
+        cur = g.db.cursor()
+        cur.execute(sql.get_user(), (int(g.user),))
+        user = cur.fetchone()
+        if user:
+            last_points_given_at = user["last_points_given_at"] or datetime.now()
+            now = datetime.now()
+            extra_points = extra_points_for_active(now, last_points_given_at)
+            if extra_points > 0:
+                cur = g.db.cursor()
+                cur.execute(sql.after_login(), (extra_points, int(g.user)))
 
 @app.teardown_request
 def teardown_request(exception):
@@ -24,9 +36,13 @@ def secret():
 @app.route('/')
 def index():
     cur = g.db.cursor()
+    cur.execute(sql.get_user(), (g.user))
+    user = cur.fetchone()
+    
+    cur = g.db.cursor()
     cur.execute("SELECT * FROM users")
     rows = cur.fetchall()
-    return render_template("example.html", rows=rows, user=g.user)
+    return render_template("example.html", rows=rows, user=user)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -42,6 +58,7 @@ def login():
         print results
         if len(results) == 1:
             session['user'] = str(results[0]["id"])
+            # After_login logic
             return redirect(redirect_url())
         # error("couldn't log you in")
     return render_template("login.html")
@@ -212,4 +229,24 @@ def cancel_trade(user_id_1, user_id_2):
     	return render_template("status.html", status_text="trade canceled")
 
 
-
+@app.route('/purchase/<pack_id>', methods=['GET', 'POST'])
+def purchase(pack_id):
+	cur = g.db.cursor()
+	if request.method == 'POST':
+		print session['user']
+		print pack_id
+		cur.execute(sql.purchase_pack, {"user_id": session['user'], "pack_id": pack_id})
+		cur.execute(sql.get_user_points, {"user_id": session['user']})
+		user_points = cur.fetchone()
+		cur.execute(sql.get_pack_points, {"pack_id": pack_id})
+		pack_points = cur.fetchone()
+		if user_points >= pack_points:
+			cur.execute(sql.deduct_points, {"user_id": session['user'], "pack_id": pack_id})
+			g.db.commit()
+		else:
+			return render_template("status.html", status_text="you dont have enough pts")		
+		return render_template("status.html", status_text="trade complete")		
+	cur.execute(sql.get_pack, (pack_id,))
+	results = cur.fetchall()
+	#print results
+	return render_template("purchase_pack.html", results=results)
