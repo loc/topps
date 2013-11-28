@@ -100,7 +100,7 @@ def cards(id=None, sort="team"):
 
     cards_sorted = {'type': sort, 'cards': card_sort(cards, sort)}
 
-    return render_template("cards.html", sorted=cards_sorted, user=user, is_my_own=is_my_own)
+    return render_template("cards.html", sorted=cards_sorted, user=user, is_my_own=is_my_own, sort=sort)
 
 @app.route('/card/<card_id>')
 def card(card_id):

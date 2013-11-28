@@ -35,6 +35,17 @@
 
 			resizr();
 
+			$('.sort-by-select').change(function() {
+				$('.sort-type').text($(this).val());
+				if (/sort\/[a-zA-Z]+/.test(window.location.href)) {
+					window.location.href = window.location.href.replace(/sort\/[a-zA-Z]+/, "sort/" + $(this).val());
+				}
+				else {
+					window.location.href = window.location.href + "sort/" + $(this).val();
+				}
+				console.log(window.location.href);
+
+			})
 
 
 			$('.card img').each(function(i, ele) {
@@ -67,6 +78,17 @@
 	{% else %}
 		<h1>{{user.full_name}}'s Cards</h1>
 	{% endif %}
+
+	<div class="sort-by">
+		<span>Sort by:</span>
+		<span class="sort-type">{{ sort }}</span>
+		<select class="sort-by-select">
+			<option value="team">Team</option>
+			<option value="position" {% if sort=="position" %}selected{%endif%}>Position</option>
+			<option value="division" {% if sort=="division" %}selected{%endif%}>Division</option>
+			<option value="conference" {% if sort=="conference" %}selected{%endif%}>Conference</option>
+		</select>
+	</div>
 </div>
 
 
