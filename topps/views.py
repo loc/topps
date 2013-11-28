@@ -4,11 +4,23 @@ from stmts import stmts as sql
 from util import *
 import urllib
 from MySQLdb import escape_string as escape
+from datetime import datetime
 
 @app.before_request
 def before_request():
     g.db = connect_db()
     g.user = session['user'] if 'user' in session else None
+    if g.user:
+        cur = g.db.cursor()
+        cur.execute(sql.get_user(), (int(g.user),))
+        user = cur.fetchone()
+        if user:
+            last_points_given_at = user["last_points_given_at"] or datetime.now()
+            now = datetime.now()
+            extra_points = extra_points_for_active(now, last_points_given_at)
+            if extra_points > 0:
+                cur = g.db.cursor()
+                cur.execute(sql.after_login(), (extra_points, int(g.user)))
 
 @app.teardown_request
 def teardown_request(exception):
@@ -24,9 +36,13 @@ def secret():
 @app.route('/')
 def index():
     cur = g.db.cursor()
+    cur.execute(sql.get_user(), (g.user))
+    user = cur.fetchone()
+    
+    cur = g.db.cursor()
     cur.execute("SELECT * FROM users")
     rows = cur.fetchall()
-    return render_template("example.html", rows=rows, user=g.user)
+    return render_template("example.html", rows=rows, user=user)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -42,6 +58,7 @@ def login():
         print results
         if len(results) == 1:
             session['user'] = str(results[0]["id"])
+            # After_login logic
             return redirect(redirect_url())
         # error("couldn't log you in")
     return render_template("login.html")
