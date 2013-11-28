@@ -120,10 +120,10 @@ def card(card_id):
 
     return render_template("card.html",card_id=card_id, first_name=first_name, last_name=last_name, number=number, image_url=image_url, position=position, team_name=team_name)
 
-@app.route('/trade/<user_id_1>/<user_id_2>/initiate', methods=['GET', 'POST'])
-def initiate_trade(user_id_1, user_id_2):
+@app.route('/trade/<other_user_id>/initiate', methods=['GET', 'POST'])
+def initiate_trade(other_user_id):
     cur = g.db.cursor()
-    cur.execute(sql.check_trades(user_id_1, user_id_2)) #if trade between user1 and user2 exists, return it
+    cur.execute(sql.check_trades(g.user, other_user_id)) #if trade between user1 and user2 exists, return it
     results = cur.fetchone()
 
     #update trade cards table based on post (user1's desired cards and cards willing to trade)
@@ -132,30 +132,30 @@ def initiate_trade(user_id_1, user_id_2):
         user1_desired = request.form['user1_desired'].split()
 
         for id in user1_cards:
-            cur.execute(sql.insert_trade_cards(results['trade_id'], id, user_id_1, False))
+            cur.execute(sql.insert_trade_cards(results['trade_id'], id, g.user, False))
             g.db.commit()
 
         for id in user1_desired:
-            cur.execute(sql.insert_trade_cards(results['trade_id'], id, user_id_1, True))   
+            cur.execute(sql.insert_trade_cards(results['trade_id'], id, g.user, True))   
             g.db.commit()
 
-        return redirect(url_for('accept_trade', user_id_1=user_id_1, user_id_2=user_id_2)) #after post, redirect to accept stage
+        return redirect(url_for('accept_trade', other_user_id=other_user_id)) #after post, redirect to accept stage
 
     #check and make sure there are no previously unresolved trades between the two parties
     if results is not None:
         return render_template("status.html", status_text="trade has already been initiated")
 
     #initiate a trade in the trade table
-    cur.execute(sql.initiate_trade(user_id_1,user_id_2))
+    cur.execute(sql.initiate_trade(g.user, other_user_id))
     g.db.commit()
     return render_template("status.html", status_text="trade initiated")
 
 
-@app.route('/trade/<user_id_1>/<user_id_2>/accept', methods=['GET', 'POST'])
-def accept_trade(user_id_1, user_id_2):
+@app.route('/trade/<other_user_id>/accept', methods=['GET', 'POST'])
+def accept_trade(other_user_id):
     status_text = None;
     cur = g.db.cursor()
-    cur.execute(sql.check_trades(user_id_1, user_id_2)) #if a trade between user1 and user2 exists, return it
+    cur.execute(sql.check_trades(g.user, other_user_id)) #if a trade between user1 and user2 exists, return it
     results = cur.fetchone()
 
     #update trade cards on a post (user2's cards willing to trade)
@@ -163,10 +163,10 @@ def accept_trade(user_id_1, user_id_2):
         user2_cards = request.form['user2_cards'].split()
 
         for id in user2_cards:
-            cur.execute(sql.insert_trade_cards(results['trade_id'], id, user_id_2, False))
+            cur.execute(sql.insert_trade_cards(results['trade_id'], id, other_user_id, False))
             g.db.commit()
 
-        return redirect(url_for('confirm_trade', user_id_1=user_id_1, user_id_2=user_id_2)) #after post, redirect to confirm stage
+        return redirect(url_for('confirm_trade', other_user_id=other_user_id)) #after post, redirect to confirm stage
 
     #check and make sure a trade has previously been initiated between the two parties
     if results is None:
@@ -184,15 +184,15 @@ def accept_trade(user_id_1, user_id_2):
         return render_template("status.html", status_text=status_text)
 
     #update trade table to include accept timestamp
-    cur.execute(sql.accept_trade(user_id_1,user_id_2))
+    cur.execute(sql.accept_trade(g.user,other_user_id))
     g.db.commit()
     return render_template("status.html", status_text="trade accepted")
 
-@app.route('/trade/<user_id_1>/<user_id_2>/confirm', methods=['GET', 'POST'])
-def confirm_trade(user_id_1, user_id_2):
+@app.route('/trade/<other_user_id>/confirm', methods=['GET', 'POST'])
+def confirm_trade(other_user_id):
     status_text = None
     cur = g.db.cursor()
-    cur.execute(sql.check_trades(user_id_1, user_id_2))
+    cur.execute(sql.check_trades(g.user, other_user_id))
     results = cur.fetchone()
 
     #check and make sure a trade has both been initiated and accepted between the two parties
@@ -210,15 +210,15 @@ def confirm_trade(user_id_1, user_id_2):
         return render_template("status.html", status_text=status_text)      
 
     #update trade table to include confirm timestamp
-    cur.execute(sql.confirm_trade(user_id_1,user_id_2))
+    cur.execute(sql.confirm_trade(g.user,other_user_id))
     g.db.commit()
     return render_template("status.html", status_text="trade confirmed")
 
-@app.route('/trade/<user_id_1>/<user_id_2>/perform', methods=['GET', 'POST'])
-def perform_trade(user_id_1, user_id_2):
+@app.route('/trade/<other_user_id>/perform', methods=['GET', 'POST'])
+def perform_trade(other_user_id):
     status_text = None; 
     cur = g.db.cursor()
-    cur.execute(sql.check_trades(user_id_1, user_id_2))
+    cur.execute(sql.check_trades(g.user, other_user_id))
     results = cur.fetchone()
 
     #check and make sure trade has been initiated, accepted, and confirmed
@@ -239,20 +239,20 @@ def perform_trade(user_id_1, user_id_2):
     trade_results = cur.fetchall()
     for trade in trade_results:
 
-        if trade['from_id'] == int(user_id_1) and trade['desired'] == False :
-            cur.execute(sql.trade_card(trade['card_id'], user_id_2))
+        if trade['from_id'] == int(g.user) and trade['desired'] == False :
+            cur.execute(sql.trade_card(trade['card_id'], other_user_id))
             g.db.commit()
 
-        elif trade['from_id'] == int(user_id_2) and trade['desired'] == False :
-            cur.execute(sql.trade_card(trade['card_id'], user_id_1))
+        elif trade['from_id'] == int(other_user_id) and trade['desired'] == False :
+            cur.execute(sql.trade_card(trade['card_id'], g.user))
             g.db.commit()           
 
     return render_template("status.html", status_text="trade performed")
 
-@app.route('/trade/<user_id_1>/<user_id_2>/cancel', methods=['GET', 'POST'])
-def cancel_trade(user_id_1, user_id_2):
+@app.route('/trade/<other_user_id>/cancel', methods=['GET', 'POST'])
+def cancel_trade(other_user_id):
     cur = g.db.cursor()
-    cur.execute(sql.cancel_trade(user_id_1,user_id_2))
+    cur.execute(sql.cancel_trade(g.user,other_user_id))
     g.db.commit()
     return render_template("status.html", status_text="trade canceled")
 
