@@ -2,48 +2,115 @@
 
 {% block css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='card.css') }}">
-<style>
-	.card .front {
-		background-image: url({{image_url}});
-	}
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='cards.css') }}">
 {% endblock %}
 
 {% block js %}
 	<script>
 		$(function() {
-			$('.flip').on("click", function(e) {
-				console.log("hellow");
-				$(this).parents(".card").toggleClass("flipped");
+			$('.card').on("click", function(e) {
+				$(this).toggleClass("flipped");
+			});
+
+			var card = $('.card'),
+				cardWidth = card.width(),
+				cardHeight = card.height();
+
+			$('.card .front').hover(function() {
+				var $this = $(this);
+				$(this).stop().find('.caption').slideDown(100, function() {
+					//$this.find('.flip').delay(50).slideDown(100);
+				});
+			}, function() {
+				$(this).find('.caption').stop().slideUp();
+				//$(this).find('.flip').stop().hide();
+			});
+
+			function resizr() {
+				var offset = ($(window).width()-980)/2;
+				$('.cards').css({marginLeft: offset + "px"});
+			};
+
+			$(window).resize(resizr);
+
+			resizr();
+
+
+
+			$('.card img').each(function(i, ele) {
+
+				var $this = $(ele);
+
+				$this.load(function() {
+					var	width = $this.width(),
+						height = $this.height(),
+						newWidth = width / (height/cardHeight);
+
+					if (newWidth < cardWidth) {
+						$this.width(cardWidth);
+					}
+					else {
+						$this.height(cardHeight);
+					}
+				});
+					
 			});
 		});
 	</script>
 {% endblock %}
 
 {% block body %}
-<h1>  {{ card_id }} {{first_name}} {{last_name}} {{number}} {{image_url}} {{position}} {{team_name}} </h1>
-<div class="card">
-	<div class="side front">
-		<div class="caption">
-			<span class="title">{{first_name}} {{last_name}}</span>
-			<span class="subtitle">{{team_name}}</span>
-			<span class="subtitle">{{position}}</span>
-		</div>
-		<span class="flip">flip</span>
-	</div>
 
-	<div class="side back">
-		<div class="heading">
-			<img class="image-box">
-			<div class="title">{{first_name}} {{last_name}}</div>
-			<div class="subtitle">{{team_name}}</div>
-		</div>
-		<div class="stats">
-			Number: {{number}}
-			Position: {{position}}
-		</div>
-		<span class="flip">flip</span>
-
-	</div>
+<div class="heading">
+	{% if is_my_own %}
+		<h1>My Cards</h1>
+	{% else %}
+		<h1>{{user.full_name}}'s Cards</h1>
+	{% endif %}
 </div>
+
+
+{% for key, cards in sorted.cards.items() %}
+
+	
+	<section>
+		<div class="subheading">
+			<h2 class="key">{{key}}</h2>
+		</div>
+		<div class="cards-wrap"> 
+			<div class="cards">
+
+				{% for card in cards %}
+
+				<div class="card" data-id="{{ card.card_id }}">
+					<div class="side front">
+						<img src="{{card.image_url}}">
+						<div class="caption">
+							<span class="title">{{ card.first_name}} {{card.last_name}} <span class="position">{{card.position}}</span></span>
+							<span class="subtitle">{{card.team_name}}</span>
+						</div>
+						<span class="flip">flip</span>
+					</div>
+
+					<div class="side back">
+						<div class="heading">
+							<img class="image-box">
+							<div class="title">{{card.first_name}} {{card.last_name}}</div>
+							<div class="subtitle">{{card.team_name}}</div>
+						</div>
+						<div class="stats">
+							Number: {{card.number}}
+							Position: {{card.position}}
+						</div>
+						<span class="flip">flip</span>
+
+					</div>
+				</div>
+
+				{% endfor %}
+
+			</div>
+			</div>
+	</section>
+{% endfor %}
 {% endblock %}

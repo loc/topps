@@ -1,0 +1,52 @@
+.card {
+	display: inline-block;
+	margin: 10px;
+}
+
+.card:first-child {
+	margin-left: 0;
+}
+
+.cards {
+	white-space: nowrap;
+	margin-top: 10px;
+}
+
+.cards-wrap {
+	overflow: scroll;
+}
+
+.heading {
+	width: 980px;
+	margin: 0 auto;
+	color: white;
+	margin-top: 25px;
+	margin-bottom: 10px;
+}
+
+.heading h1 {
+	font-weight: 100;
+	color: #a9a9a9;
+	font-size: 23px;
+	margin: 0;
+}
+
+.subheading {
+	width: 980px;
+	margin: 0 auto;
+}
+.subheading .key {
+	margin: 0;
+	font-weight: 100;
+	color: rgba(255, 255, 255, 0.29);
+	font-size: 20px;
+	padding-top: 10px;
+}
+
+section {
+	padding-bottom: 10px;
+}
+
+section:nth-child(2n) {
+	background: rgba(0,0,0,.1);
+}

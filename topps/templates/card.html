@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='card.css') }}">
+{% endblock %}
+
+{% block js %}
+	<script>
+		$(function() {
+			$('.flip').on("click", function(e) {
+				$(this).parents(".card").toggleClass("flipped");
+			});
+		});
+	</script>
+{% endblock %}
+
+{% block body %}
+<h1>  {{ card_id }} {{first_name}} {{last_name}} {{number}} {{image_url}} {{position}} {{team_name}} </h1>
+<div class="card">
+	<div class="side front">
+		<img src="{{image_url}}">
+		<div class="caption">
+			<span class="title">{{first_name}} {{last_name}}</span>
+			<span class="subtitle">{{team_name}}</span>
+			<span class="subtitle">{{position}}</span>
+		</div>
+		<span class="flip">flip</span>
+	</div>
+
+	<div class="side back">
+		<div class="heading">
+			<img class="image-box">
+			<div class="title">{{first_name}} {{last_name}}</div>
+			<div class="subtitle">{{team_name}}</div>
+		</div>
+		<div class="stats">
+			Number: {{number}}
+			Position: {{position}}
+		</div>
+		<span class="flip">flip</span>
+
+	</div>
+</div>
+{% endblock %}

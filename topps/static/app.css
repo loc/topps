@@ -2,6 +2,7 @@ body {
 	background: #292929; /* Old browsers */
 	margin: 0;
 	padding: 0;
+	font-family: "Open Sans";
 }
 
 body > header {

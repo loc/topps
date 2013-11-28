@@ -48,6 +48,10 @@ def select_card(card_id):
     return "SELECT * FROM card WHERE card_id = {0}".format(ei(card_id))
 
 @print_and_return
+def get_user_cards(user_id):
+    return "SELECT * FROM card JOIN player JOIN team JOIN division WHERE team_name=team.name AND team.division=division.name AND card.player_id=player.id AND card.current_owner_id = {0} AND player.image_url IS NOT NULL;".format(ei(user_id))
+
+@print_and_return
 def trade_card(card_id, new_owner_id):
     return "UPDATE card SET current_owner_id={1} WHERE card_id={0}".format(ei(card_id), ei(new_owner_id))
 
