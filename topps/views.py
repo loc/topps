@@ -1,9 +1,9 @@
 from topps import app
 from flask import Flask, request, session, g, render_template, redirect, url_for
+# stmts does escaping internally
 from stmts import stmts as sql
 from util import *
 import urllib
-from MySQLdb import escape_string as escape
 from datetime import datetime
 
 @app.before_request
@@ -12,7 +12,7 @@ def before_request():
     g.user = session['user'] if 'user' in session else None
     if g.user:
         cur = g.db.cursor()
-        cur.execute(sql.get_user(), (int(g.user),))
+        cur.execute(sql.get_user(g.user))
         user = cur.fetchone()
         if user:
             last_points_given_at = user["last_points_given_at"] or datetime.now()
@@ -20,7 +20,7 @@ def before_request():
             extra_points = extra_points_for_active(now, last_points_given_at)
             if extra_points > 0:
                 cur = g.db.cursor()
-                cur.execute(sql.after_login(), (extra_points, int(g.user)))
+                cur.execute(sql.after_login(g.user, extra_points))
 
 @app.teardown_request
 def teardown_request(exception):
@@ -36,7 +36,7 @@ def secret():
 @app.route('/')
 def index():
     cur = g.db.cursor()
-    cur.execute(sql.get_user(), (g.user))
+    cur.execute(sql.get_user(g.user))
     user = cur.fetchone()
     
     cur = g.db.cursor()
@@ -50,10 +50,8 @@ def login():
     if g.user is not None:
         return redirect(url_for('index'))
     if request.method == 'POST':
-        email = escape(request.form['email'])
-        password = escape(request.form['password'])
         cur = g.db.cursor()
-        cur.execute(sql.login(email, password))
+        cur.execute(sql.login(request.form['email'], request.form['password']))
         results = cur.fetchall()
         print results
         if len(results) == 1:
@@ -97,10 +95,8 @@ def initiate_trade(user_id_1, user_id_2):
 
 	#update trade cards table based on post (user1's desired cards and cards willing to trade)
 	if request.method == 'POST': 
-        	user1_cards = escape(request.form['user1_cards'])
-        	user1_cards = user1_cards.split()
-		user1_desired = escape(request.form['user1_desired'])
-		user1_desired = user1_desired.split()
+		user1_cards = request.form['user1_cards'].split()
+		user1_desired = request.form['user1_desired'].split()
 
 		for id in user1_cards:
 			cur.execute(sql.insert_trade_cards(results['trade_id'], id, user_id_1, False))
@@ -131,8 +127,7 @@ def accept_trade(user_id_1, user_id_2):
 
 	#update trade cards on a post (user2's cards willing to trade)
 	if request.method == 'POST':
-        	user2_cards = escape(request.form['user2_cards'])
-        	user2_cards = user2_cards.split()
+		user2_cards = request.form['user2_cards'].split()
 
 		for id in user2_cards:
 			cur.execute(sql.insert_trade_cards(results['trade_id'], id, user_id_2, False))
@@ -235,18 +230,18 @@ def purchase(pack_id):
 	if request.method == 'POST':
 		print session['user']
 		print pack_id
-		cur.execute(sql.purchase_pack, {"user_id": session['user'], "pack_id": pack_id})
-		cur.execute(sql.get_user_points, {"user_id": session['user']})
+		cur.execute(sql.purchase_pack(session['user'], pack_id))
+		cur.execute(sql.get_user_points(session['user']))
 		user_points = cur.fetchone()
-		cur.execute(sql.get_pack_points, {"pack_id": pack_id})
+		cur.execute(sql.get_pack_points(pack_id))
 		pack_points = cur.fetchone()
 		if user_points >= pack_points:
-			cur.execute(sql.deduct_points, {"user_id": session['user'], "pack_id": pack_id})
+			cur.execute(sql.deduct_points(session['user'], pack_id))
 			g.db.commit()
 		else:
 			return render_template("status.html", status_text="you dont have enough pts")		
 		return render_template("status.html", status_text="trade complete")		
-	cur.execute(sql.get_pack, (pack_id,))
+	cur.execute(sql.get_pack(pack_id))
 	results = cur.fetchall()
 	#print results
 	return render_template("purchase_pack.html", results=results)

@@ -1,99 +1,109 @@
+from MySQLdb import escape_string as e
+
+# This makes sure the value looks like an int to start with.
+ei = lambda val: e(str(int(val)))
+
+# A decorator so we don't always have to do `print stmt; return stmt` at the end
+def print_and_return(func):
+    def pr_wrapper(*arg):
+        res = func(*arg)
+        print res
+        return res
+    return pr_wrapper
+
+@print_and_return
 def login(email, password):
-    stmt = "SELECT * FROM users WHERE email='{0}' AND password=MD5('{1}');".format(email, password)
-    print stmt
-    return stmt
+    return "SELECT * FROM users WHERE email='{0}' AND password=MD5('{1}');".format(e(email), e(password))
 
-def get_user():
-    stmt = "SELECT * FROM users WHERE id=%s LIMIT 1;"
-    print stmt
-    return stmt
+@print_and_return
+def get_user(user_id):
+    return "SELECT * FROM users WHERE id={0} LIMIT 1;".format(ei(user_id))
 
-def after_login():
-    stmt = "UPDATE users SET last_points_given_at=CURRENT_TIMESTAMP, points = points + %s WHERE id = %s;"
-    print stmt
-    return stmt
+@print_and_return
+def after_login(user_id, extra_points):
+    return "UPDATE users SET last_points_given_at=CURRENT_TIMESTAMP, points = points + {1} WHERE id = {0};".format(ei(user_id), ei(extra_points))
 
+@print_and_return
 def populate_card(player_id):
-    stmt = "SELECT * FROM player WHERE id='{0}'".format(player_id)
-    print stmt
-    return stmt
+    return "SELECT * FROM player WHERE id={0} LIMIT 1;".format(ei(player_id))
 
+@print_and_return
 def initiate_trade(user_id_1, user_id_2):
-    stmt = "INSERT INTO trade (prop_id, accepter_id) VALUES ({0}, {1})".format(user_id_1, user_id_2)
-    print stmt
-    return stmt
+    return "INSERT INTO trade (prop_id, accepter_id) VALUES ({0}, {1})".format(ei(user_id_1), ei(user_id_2))
 
+@print_and_return
 def accept_trade(user_id_1, user_id_2):
-    stmt = "UPDATE trade SET accepted_at=CURRENT_TIMESTAMP WHERE prop_id={0} AND accepter_id={1}".format(user_id_1,user_id_2) 
-    print stmt
-    return stmt
+    return "UPDATE trade SET accepted_at=CURRENT_TIMESTAMP WHERE prop_id={0} AND accepter_id={1}".format(ei(user_id_1), ei(user_id_2))
 
+@print_and_return
 def confirm_trade(user_id_1, user_id_2):
-    stmt = "UPDATE trade SET confirmed_at=CURRENT_TIMESTAMP WHERE prop_id={0} AND accepter_id={1}".format(user_id_1,user_id_2)
-    print stmt
-    return stmt
+    return "UPDATE trade SET confirmed_at=CURRENT_TIMESTAMP WHERE prop_id={0} AND accepter_id={1}".format(ei(user_id_1), ei(user_id_2))
 
+@print_and_return
 def cancel_trade(user_id_1, user_id_2):
-    stmt = "DELETE FROM trade WHERE prop_id={0} AND accepter_id={1}".format(user_id_1, user_id_2)
-    print stmt
-    return stmt
+    return "DELETE FROM trade WHERE prop_id={0} AND accepter_id={1}".format(ei(user_id_1), ei(user_id_2))
 
+@print_and_return
 def select_card(card_id):
-    stmt = "SELECT * FROM card WHERE card_id = {0}".format(card_id)
-    print stmt
-    return stmt
+    return "SELECT * FROM card WHERE card_id = {0}".format(ei(card_id))
 
+@print_and_return
 def trade_card(card_id, new_owner_id):
-    stmt = "UPDATE card SET current_owner_id={1} WHERE card_id={0}".format(card_id, new_owner_id)
-    print stmt
-    return stmt
+    return "UPDATE card SET current_owner_id={1} WHERE card_id={0}".format(ei(card_id), ei(new_owner_id))
 
+@print_and_return
 def check_trades(user_id_1, user_id_2):
-    stmt = "SELECT * FROM trade WHERE prop_id={0} AND accepter_id={1}".format(user_id_1, user_id_2)
-    print stmt
-    return stmt
+    return "SELECT * FROM trade WHERE prop_id={0} AND accepter_id={1}".format(ei(user_id_1), ei(user_id_2))
 
+@print_and_return
 def insert_trade_cards(trade_id, card_id, from_id, desired):
-    stmt = "INSERT INTO `trade cards` (`trade_id` ,`card_id` ,`from_id` ,`desired`)VALUES ({0}, {1}, {2}, {3})".format(trade_id, card_id, from_id, desired)
-    print stmt
-    return stmt
+    raw = "INSERT INTO `trade cards` (`trade_id` ,`card_id` ,`from_id` ,`desired`) VALUES ({0}, {1}, {2}, {3})"
+    return raw.format(ei(trade_id), ei(card_id), ei(from_id), e(desired))
 
+@print_and_return
 def select_trade_cards(trade_id):
-    stmt = "SELECT * FROM `trade cards` WHERE trade_id={0}".format(trade_id)
-    print stmt
-    return stmt
+    return "SELECT * FROM `trade cards` WHERE trade_id={0}".format(ei(trade_id))
 
+@print_and_return
+def insert_pack(pack_name, points):
+    return "INSERT INTO packs VALUES (NULL, {0}, {1});".format(e(pack_name), ei(points))
 
-# (pack_name, points, [player_ids])
-insert_pack = "INSERT (NULL, %s, %s) INTO packs;"
-# (pack_id, player_id)
-insert_pack_player = "INSERT (%s, %s) INTO packs_players;"
+@print_and_return
+def insert_pack_player(pack_id, player_id):
+    return "INSERT INTO packs_players VALUES ({0}, {1})".format(ei(pack_id), ei(player_id))
 
-# ()
-get_packs = """SELECT * FROM packs;"""
+@print_and_return
+def get_packs():
+    return "SELECT * FROM packs;"
 
-# (pack_id,)
-get_pack = """SELECT * FROM packs 
-                            INNER JOIN packs_players ON packs.pack_id = packs_players.pack_id 
-                            INNER JOIN player ON player.id = packs_players.player_id
-                       WHERE packs.pack_id = %s; """
+@print_and_return
+def get_pack(pack_id):
+    return """SELECT *
+              FROM packs
+                   INNER JOIN packs_players ON packs.pack_id = packs_players.pack_id
+                   INNER JOIN player ON player.id = packs_players.player_id
+              WHERE packs.pack_id = {0};""".format(ei(pack_id))
 
+@print_and_return
+def purchase_pack(user_id, pack_id):
+    return """INSERT INTO card
+                          SELECT NULL, packs_players.player_id, {0}
+                          FROM packs
+                               INNER JOIN packs_players ON packs.pack_id = packs_players.pack_id
+                          WHERE packs.pack_id = {1}
+                          AND (SELECT users.points FROM users WHERE users.id = {0}) > packs.points;""".format(ei(user_id), ei(pack_id))
 
-# (user_id, pack_id)
-purchase_pack = """INSERT INTO card
-SELECT NULL, packs_players.player_id, %(user_id)s
-FROM packs
-INNER JOIN packs_players ON packs.pack_id = packs_players.pack_id
-WHERE packs.pack_id = %(pack_id)s
-AND (SELECT users.points FROM users WHERE users.id = %(user_id)s) > packs.points;"""
+@print_and_return
+def deduct_points(user_id, pack_id):
+    return """UPDATE users
+              SET users.points = users.points - (SELECT packs.points FROM packs WHERE packs.pack_id = {1} LIMIT 1)
+              WHERE users.id = {0}
+              LIMIT 1;""".format(ei(user_id), ei(pack_id))
 
-#(user_id, pack_id)
-deduct_points = """UPDATE users
-SET users.points = users.points - (SELECT packs.points FROM packs WHERE packs.pack_id = %(pack_id)s )
-WHERE users.id = %(user_id)s;"""
+@print_and_return
+def get_user_points(user_id):
+    return "SELECT points FROM users WHERE id={0};".format(ei(user_id))
 
-#(user_id,)
-get_user_points = """SELECT points FROM users WHERE id=%(user_id)s;"""
-
-#(pack_id,)
-get_pack_points = """SELECT points from packs WHERE pack_id=%(pack_id)s;"""
+@print_and_return
+def get_pack_points(pack_id):
+    return "SELECT points from packs WHERE pack_id={0};".format(ei(pack_id))
