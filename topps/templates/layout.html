@@ -1,0 +1,18 @@
+<html>
+<head>
+	<link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+	{% block css %}{% endblock %}
+	{% block js %}{% endblock %}
+</head>
+	<body>
+		<header>
+			<div class="w">
+				<div class="logo">
+					<img src="{{ url_for('static', filename='images/logo.png') }}" alt="" height="40">
+				</div> 
+			</div>
+		</header>
+		{% block body %}{% endblock %}
+	</body>
+</html>

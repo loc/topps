@@ -1,0 +1,18 @@
+body {
+	background: #292929; /* Old browsers */
+	margin: 0;
+	padding: 0;
+}
+
+body > header {
+	background: #2c72b3;
+	border-top: 1px solid #4e89bf;
+	border-bottom: 5px solid #2064a2;
+	padding: 10px 0;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+}
+
+header .w {
+	width: 980px;
+	margin: 0 auto;
+}
