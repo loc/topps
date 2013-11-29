@@ -12,6 +12,10 @@
 	margin-top: 10px;
 }
 
+.num-selected {
+	display: none;
+}
+
 .cards-wrap {
 	overflow: scroll;
 }
