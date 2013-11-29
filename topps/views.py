@@ -1,5 +1,5 @@
 from topps import app
-from flask import Flask, request, session, g, render_template, redirect, url_for
+from flask import Flask, request, session, g, render_template, redirect, url_for, jsonify, json, make_response
 # stmts does escaping internally
 from stmts import stmts as sql
 from util import *
@@ -321,3 +321,24 @@ def register():
 		return render_template("status.html", status_text=status_text)
 	else:
 		return render_template("register.html")
+
+@app.route('/export', methods=['GET', 'POST'])
+def export():
+	status_text = None
+	
+	cur = g.db.cursor()
+
+	cur.execute(sql.get_users())
+	results = cur.fetchall()
+	ret_val = json.dumps(results)
+
+	cur.execute(sql.get_card())
+	results = cur.fetchall()
+	ret_val = str(ret_val+json.dumps(results))
+	response = make_response(render_template("status.html", status_text=ret_val))
+	response.headers['Content-Disposition']="attachment;filename=export.json"
+	response.headers['Content-Type']="application/json"
+
+	
+	return response
+

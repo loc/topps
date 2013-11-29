@@ -119,3 +119,11 @@ def register_user(email, full_name, password):
 @print_and_return
 def check_registered(email):
     return """SELECT id FROM users WHERE email="{0}";""".format(e(email))
+
+@print_and_return
+def get_users():
+    return """SELECT * FROM users;"""
+
+@print_and_return
+def get_card():
+    return """SELECT * FROM card;"""
