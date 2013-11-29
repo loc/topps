@@ -111,3 +111,11 @@ def get_user_points(user_id):
 @print_and_return
 def get_pack_points(pack_id):
     return "SELECT points from packs WHERE pack_id={0};".format(ei(pack_id))
+
+@print_and_return
+def register_user(email, full_name, password):
+    return """INSERT INTO `users` (`email`, `full_name`, `password`) VALUES ("{0}", "{1}", MD5("{2}"));""".format(e(email), e(full_name), e(password)) 
+
+@print_and_return
+def check_registered(email):
+    return """SELECT id FROM users WHERE email="{0}";""".format(e(email))

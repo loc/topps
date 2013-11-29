@@ -278,3 +278,46 @@ def purchase(pack_id):
     # results = cur.fetchall()
     # #print results
     # return render_template("purchase_pack.html", results=results)
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+	status_text = None
+	cur=g.db.cursor()
+	if request.method == 'POST':
+		full_name = request.form['full_name']
+		email = request.form['email']
+		password = request.form['password']
+		confirm_password = request.form['confirm_password']
+		
+		if full_name == "":
+			status_text = "Must input a name"
+
+		elif email == "":
+			status_text = "Must input an email"
+	
+		elif password == "":
+			status_text = "Must input a password"
+
+		elif confirm_password == "":
+			status_text = "Must input password confirmation"
+
+		elif password != confirm_password:
+			status_text = "Password and password confirmation do not match"
+	
+		else:
+			cur.execute(sql.check_registered(email))
+			registered = cur.fetchone()
+			print registered
+			if registered is not None:
+				status_text = "This email is already registered"
+
+		if status_text is not None:
+			return render_template("status.html", status_text=status_text)
+
+		cur.execute(sql.register_user(email, full_name, password))
+		g.db.commit()
+		status_text="registration success"
+	if status_text is not None:
+		return render_template("status.html", status_text=status_text)
+	else:
+		return render_template("register.html")
