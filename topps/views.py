@@ -322,23 +322,66 @@ def register():
 	else:
 		return render_template("register.html")
 
-@app.route('/export', methods=['GET', 'POST'])
+@app.route('/export.json', methods=['GET', 'POST'])
 def export():
 	status_text = None
-	
+	export = {}
 	cur = g.db.cursor()
-
+ 
+	export['users'] = []
 	cur.execute(sql.get_users())
-	results = cur.fetchall()
-	ret_val = json.dumps(results)
+	for user_row in cur.fetchall():
+		export['users'].append(user_row)
 
+	export['card'] = []
 	cur.execute(sql.get_card())
-	results = cur.fetchall()
-	ret_val = str(ret_val+json.dumps(results))
-	response = make_response(render_template("status.html", status_text=ret_val))
+	for card_row in cur.fetchall():
+		export['card'].append(card_row)
+
+	export['conference']=[]
+	cur.execute(sql.get_conference())
+	for conference_row in cur.fetchall():
+		export['conference'].append(conference_row)
+
+	export['division']=[]
+	cur.execute(sql.get_division())
+	for division_row in cur.fetchall():
+		export['division'].append(division_row)
+
+	export['packs']=[]
+	cur.execute(sql.get_packs())
+	for packs_row in cur.fetchall():
+		export['packs'].append(packs_row)
+
+	export['packs_players']=[]
+	cur.execute(sql.get_packs_players())
+	for packs_players_row in cur.fetchall():
+		export['packs_players'].append(packs_players_row)
+
+	export['player']=[]
+	cur.execute(sql.get_player())
+	for player_row in cur.fetchall():
+		export['player'].append(player_row)
+
+	export['team']=[]
+	cur.execute(sql.get_packs())
+	for team_row in cur.fetchall():
+		export['team'].append(team_row)
+	
+	export['trade']=[]
+	cur.execute(sql.get_trade())
+	for trade_row in cur.fetchall():
+		export['trade'].append(trade_row)
+
+	export['trade_cards']=[]
+	cur.execute(sql.get_trade_cards())
+	for trade_cards_row in cur.fetchall():
+		export['trade_cards'].append(trade_cards_row)
+
+	json_result = json.dumps(export)
+	response = make_response(json_result)
 	response.headers['Content-Disposition']="attachment;filename=export.json"
 	response.headers['Content-Type']="application/json"
-
-	
+ 
 	return response
 

@@ -127,3 +127,36 @@ def get_users():
 @print_and_return
 def get_card():
     return """SELECT * FROM card;"""
+
+@print_and_return
+def get_conference():
+    return """SELECT * FROM conference;"""
+
+@print_and_return
+def get_division():
+    return """SELECT * FROM division;"""
+
+@print_and_return
+def get_packs_players():
+    return """SELECT * FROM packs_players;"""
+
+@print_and_return
+def get_player():
+    return """SELECT * FROM player;"""
+
+@print_and_return
+def get_team():
+    return """SELECT * FROM team;"""
+
+@print_and_return
+def get_trade():
+    return """SELECT * FROM trade;"""
+
+@print_and_return
+def get_trade_cards():
+     return """SELECT * FROM trade_cards;"""
+
+
+
+
+	
