@@ -25,7 +25,7 @@ def get_other_users(user_id):
 
 @print_and_return
 def after_login(user_id, extra_points):
-    return "UPDATE users SET last_points_given_at=CURRENT_TIMESTAMP, points = points + {1} WHERE id = {0};".format(ei(user_id), ei(extra_points))
+    return "UPDATE users SET points = points + {1} WHERE id = {0};".format(ei(user_id), ei(extra_points))
 
 @print_and_return
 def populate_card(player_id):
@@ -140,7 +140,7 @@ def get_pack_points(pack_id):
 @print_and_return
 def register_user(email, full_name, password):
     # We give them 10 points to start off with, for the lols
-    return """INSERT INTO `users` (`email`, `full_name`, `password`, `last_points_given_at`, `points`) VALUES ("{0}", "{1}", MD5("{2}"), CURRENT_TIMESTAMP, 10);""".format(e(email), e(full_name), e(password))
+    return """INSERT INTO `users` (`email`, `full_name`, `password`, `points`) VALUES ("{0}", "{1}", MD5("{2}"), 10);""".format(e(email), e(full_name), e(password))
 
 @print_and_return
 def check_registered(email):
