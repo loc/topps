@@ -19,6 +19,7 @@
 	-moz-border-radius: 9px;
 	border-radius: 9px;
 	box-sizing: border-box;
+	-moz-box-sizing: border-box;
 	color: rgba(255, 255, 255, 0.3);
 	font-weight: 100;
 	border-radius: 9px;
@@ -41,6 +42,8 @@
 .cards-wrap {
 	overflow: scroll;
 	clear: left;
+	float: left;
+	width: 100%;
 }
 
 .propose-trade-button {
@@ -56,6 +59,7 @@
 	background: #292929;
 	padding: 10px;
 	box-sizing: border-box;
+	-moz-box-sizing: border-box;
 }
 
 .heading.fixed {
@@ -118,13 +122,21 @@
 	position: absolute;
 	right: 10px;
 	top: 12px;
+}
 
+.cards-list {
+	clear: both;
+	width: 980px;
+	margin: 0 auto;
+	padding-top: 10px;
+}
+.cards-list .card:first-child {
+	margin: 10px;
 }
 
 .sort-by-select {
-	background: none;
+
 	-webkit-appearance: none;
-	color: transparent;
 	border: none;
 	border-radius: 30px;
 	outline: none;
@@ -133,6 +145,7 @@
 	left: 0;
 	top: 0;
 	bottom: 0;
+	opacity: 0;
 }
 
 .sort-by .sort-type {
@@ -142,6 +155,7 @@
 section {
 	padding-bottom: 10px;
 	clear: left;
+
 }
 
 section:nth-child(2n) {

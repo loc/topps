@@ -32,8 +32,18 @@ def populate_card(player_id):
     return "SELECT * FROM player WHERE id={0} LIMIT 1;".format(ei(player_id))
 
 @print_and_return
+def get_notifications_count(user_id):
+    return "SELECT COUNT(*) FROM `trade` WHERE (prop_id={0} OR accepter_id={0}) AND last_edited != {0} AND confirmed_at IS NULL;".format(ei(user_id))
+
+@print_and_return
+def get_active_trades(user_id):
+    return "SELECT *, proposer.id, proposer.full_name FROM trade JOIN users AS proposer ON proposer.id=trade.prop_id \
+            LEFT OUTER JOIN users AS accepter ON accepter.id=accepter_id WHERE (prop_id={0} OR accepter_id={0}) AND confirmed_at IS NULL".format(ei(user_id))
+
+@print_and_return
 def select_trade(trade_id):
-    return "SELECT *, proposer.id, proposer.full_name FROM trade JOIN users AS proposer ON proposer.id=trade.prop_id LEFT OUTER JOIN users AS accepter ON accepter.id=accepter_id WHERE trade_id = {0}".format(ei(trade_id))
+    return "SELECT *, proposer.id, proposer.full_name FROM trade JOIN users AS proposer ON proposer.id=trade.prop_id \
+            LEFT OUTER JOIN users AS accepter ON accepter.id=accepter_id WHERE trade_id = {0}".format(ei(trade_id))
 
 @print_and_return
 def initiate_trade(user_id_1, user_id_2=None, last_edited=None):
@@ -47,6 +57,10 @@ def initiate_trade(user_id_1, user_id_2=None, last_edited=None):
         return "INSERT INTO trade (prop_id, last_edited) VALUES ({0}, {1})".format(ei(user_id_1), ei(last_edited))
     else:
         return "INSERT INTO trade (prop_id) VALUES ({0})".format(ei(user_id_1))
+
+@print_and_return
+def propose_trade(trade_id, user_id):
+    return "UPDATE trade SET accepter_id={1} WHERE trade_id={0};".format(ei(trade_id), ei(user_id))
 
 @print_and_return
 def counter_trade(last_edited, trade_id):
@@ -87,7 +101,7 @@ def insert_trade_cards(trade_id, card_id, from_id, desired):
 
 @print_and_return
 def select_trade_cards(trade_id):
-    return "SELECT * FROM `trade_cards` JOIN card JOIN player WHERE trade_cards.card_id=card.card_id AND player.id=card.player_id AND trade_id={0}".format(ei(trade_id))
+    return "SELECT DISTINCT * FROM `trade_cards` JOIN card JOIN player WHERE trade_cards.card_id=card.card_id AND player.id=card.player_id AND trade_id={0}".format(ei(trade_id))
 
 @print_and_return
 def remove_trade_cards(trade_id, card_id):

@@ -40,6 +40,7 @@ $(function() {
 		var $this = $(ele);
 
 		$this.load(function() {
+			console.count()
 			var	width = $this.width(),
 				height = $this.height(),
 				newWidth = width / (height/cardHeight);

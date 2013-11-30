@@ -35,9 +35,20 @@
 		<header>
 			<div class="w">
 				<div class="logo">
-					<img src="{{ url_for('static', filename='images/logo.png') }}" alt="" height="40">
+					<a href="{{ url_for('cards') }}"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="" height="40"></a>
 				</div> 
+
+				{% if g.user %}
+				<div class="account dropdown">
+					<span class="label">Account</span>
+					<ul class="flyout">
+						<li><a href="#">Active Trades {% if g.notifications > 0 %}<span class="notify">{{g.notifications }}</span>{% endif %}</a></li>
+						<li><a href="{{ url_for('logout') }}">Logout</a></li>
+					</ul>
+				</div>
+				{% endif %}
 			</div>
+
 		</header>
 		{% block body %}{% endblock %}
 	</body>

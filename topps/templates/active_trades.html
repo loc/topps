@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='cards.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='active.css') }}">
+
+{% endblock %}
+
+{% block body %}
+
+<div class="heading">
+	<div class="w">
+		<h1>Active Trades</h1>
+	</div>
+</div>
+
+<div class="w">
+<table>
+	<thead>
+		<tr>
+			<th>With</th>
+			<th>Started</th>
+			<th>Action</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for trade in trades %}
+		<tr>
+			{% if trade['proposer.id']|string() == g.user %}
+				<td>{{ trade['accepter.full_name'] }}</td>
+			{% else %}
+				<td>{{ trade['proposer.full_name'] }}</td>
+			{% endif %}
+
+			<td>{{ trade['proposed_at']|pretty_date }}</td>
+			<td>
+			{% if trade['last_edited']|string() != g.user and trade['accepter_id'] and trade['last_edited'] %}
+			<a href="{{ url_for('confirm_trade', trade_id=trade.trade_id) }}">Confirm</a>
+			{% endif %}
+			</td>
+
+			<td><a href="{{ url_for('propose_trade', trade_id=trade.trade_id) }}">Review</a></td>
+			
+			
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+</div>
+{% endblock %}

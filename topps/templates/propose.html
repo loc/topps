@@ -4,9 +4,11 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='card.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='cards.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='propose.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='chosen/chosen.min.css') }}">
 {% endblock %}
 
 {% block js %}
+<script src="{{ url_for('static', filename='chosen/chosen.jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='cards.js') }}"></script>
 <script>
 
@@ -34,8 +36,16 @@
 	}
 
 	$(function() {
-		
+
 		$('.card').off("click");
+
+		var lastSelected;
+
+		$(".chosen-select").chosen().change(function() {
+			window.location.href = "/trade/propose/{{ trade.trade_id }}/add/" + $(this).val();
+		});
+		
+		
 
 		clickHandler = function(which) {
 			return function() {
@@ -121,7 +131,7 @@
 	</div>
 </div>
 
-<section class="proposer">
+<section class="proposer cf">
 	<div class="subheading">
 		{% if trade.prop_id %}
 			{% if trade.prop_id|string() == g.user %}
@@ -164,7 +174,7 @@
 </section>
 
 
-<section class="accepter">
+<section class="accepter cf">
 	<div class="subheading">
 		{% if trade.accepter_id %}
 			{% if trade.accepter_id|string() == g.user %}
@@ -191,7 +201,12 @@
 			{% if trade.accepter_id %}
 			<a class="button add-cards" style="{% if counter %}display: none;{% endif %}" href="{{ url_for('add_cards_to_trade', trade_id=trade.trade_id, user_id=trade.accepter_id) }}">Add cards</a>
 			{% else %}
-			<a class="button">Find Cards</a>
+			<select data-placeholder="Select Who to Trade With" class="chosen-select">
+				<option></option>	
+				{% for user in users %}
+				<option value="{{user.id}}">{{user.full_name}}</option>
+				{% endfor %}
+			</select>
 			{% endif %}
 			<button class="remove-selected">Remove Cards</button>
 		</div>
