@@ -6,7 +6,7 @@ from functools import wraps
 from datetime import timedelta
 from collections import defaultdict
 
-def connect_db():
+def connect_db(app):
     return mysql.connect(host=app.config["HOST"], db=app.config["DATABASE"], user=app.config["USERNAME"], passwd=app.config["PASSWORD"], cursorclass=mysql.cursors.DictCursor)
 
 def login_required(func):

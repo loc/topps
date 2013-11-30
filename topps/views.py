@@ -11,7 +11,7 @@ from pprint import pprint
 def before_request():
     if '/static/' in request.path:
         return
-    g.db = connect_db()
+    g.db = connect_db(app)
     g.user = session['user'] if 'user' in session else None
     if g.user:
         cur = g.db.cursor()
