@@ -7,23 +7,66 @@
 
 {% block js %}
 	<script>
+		var selected = [],
+			callbacks = {};
+
+		function toggleSelected(id) {
+			var index;
+			if ((index = selected.indexOf(id)) > -1)
+				selected.splice(index, 1);
+			else
+				selected.push(id);
+			trigger("selected");
+		}
+
+		function register(event, func) {
+			if (!(event in callbacks)) {
+				callbacks[event] = [];
+			}
+			callbacks[event].push(func);
+		}
+
+		function trigger(event) {
+			$.each(callbacks[event], function(index, func) {
+				func();
+			})
+		}
+
 		$(function() {
-			$('.card').on("click", function(e) {
-				$(this).toggleClass("flipped");
+			$('.flip').on("click", function(e) {
+				e.stopPropagation();
+				$(this).parents('.card').toggleClass("flipped");
 			});
 
 			var card = $('.card'),
 				cardWidth = card.width(),
 				cardHeight = card.height();
 
+
+			register("selected", function() {
+				var numSelected = $('.num-selected');
+				if (selected.length) {
+					numSelected.text(selected.length + ' selected');
+					numSelected.show();
+				}
+				else 
+					numSelected.hide();
+			});
+
+			$('.card').click(function() {
+				var id = $(this).attr('data-id');
+				$(this).toggleClass('selected');
+				toggleSelected(id);
+			});
+
 			$('.card .front').hover(function() {
 				var $this = $(this);
 				$(this).stop().find('.caption').slideDown(100, function() {
-					//$this.find('.flip').delay(50).slideDown(100);
+					$this.find('.flip').delay(50).slideDown(100);
 				});
 			}, function() {
 				$(this).find('.caption').stop().slideUp();
-				//$(this).find('.flip').stop().hide();
+				$(this).find('.flip').stop().hide();
 			});
 
 			function resizr() {
@@ -35,6 +78,17 @@
 
 			resizr();
 
+			$('.sort-by-select').change(function() {
+				$('.sort-type').text($(this).val());
+				if (/sort\/[a-zA-Z]+/.test(window.location.href)) {
+					window.location.href = window.location.href.replace(/sort\/[a-zA-Z]+/, "sort/" + $(this).val());
+				}
+				else {
+					window.location.href = window.location.href + "sort/" + $(this).val();
+				}
+				console.log(window.location.href);
+
+			})
 
 
 			$('.card img').each(function(i, ele) {
@@ -67,6 +121,19 @@
 	{% else %}
 		<h1>{{user.full_name}}'s Cards</h1>
 	{% endif %}
+
+	<div class="sort-by">
+		<span>Sort by:</span>
+		<span class="sort-type">{{ sort }}</span>
+		<select class="sort-by-select">
+			<option value="team">Team</option>
+			<option value="position" {% if sort=="position" %}selected{%endif%}>Position</option>
+			<option value="division" {% if sort=="division" %}selected{%endif%}>Division</option>
+			<option value="conference" {% if sort=="conference" %}selected{%endif%}>Conference</option>
+		</select>
+	</div>
+
+	<span class="num-selected">1 selected</span>
 </div>
 
 
