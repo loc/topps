@@ -23,6 +23,9 @@ def redirect_url(default='index'):
            url_for(default)
 
 def extra_points_for_active(current_datetime, last_points_given):
+    if last_points_given is None:
+            return 5
+
     diff_time = current_datetime - last_points_given
     one_day = timedelta(days=1)
 

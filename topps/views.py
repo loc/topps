@@ -18,7 +18,7 @@ def before_request():
         cur.execute(sql.get_user(g.user))
         user = cur.fetchone()
         if user:
-            last_points_given_at = user["last_points_given_at"] or datetime.now()
+            last_points_given_at = user["last_points_given_at"]
             now = datetime.now()
             extra_points = extra_points_for_active(now, last_points_given_at)
             if extra_points > 0:
