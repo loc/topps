@@ -140,7 +140,7 @@ def get_pack_points(pack_id):
 @print_and_return
 def register_user(email, full_name, password):
     # We give them 10 points to start off with, for the lols
-    return """INSERT INTO `users` (`email`, `full_name`, `password`, `points`) VALUES ("{0}", "{1}", MD5("{2}"), 10);""".format(e(email), e(full_name), e(password))
+    return """INSERT INTO `users` (`email`, `full_name`, `password`) VALUES ("{0}", "{1}", MD5("{2}"));""".format(e(email), e(full_name), e(password))
 
 @print_and_return
 def check_registered(email):
