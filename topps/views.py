@@ -15,7 +15,7 @@ app.jinja_env.filters['pretty_date'] = pretty_date
 def before_request():
     if '/static/' in request.path:
         return
-    g.db = connect_db()
+    g.db = connect_db(app)
     g.user = session['user'] if 'user' in session else None
     g.notifications = None
     if g.user:
@@ -25,7 +25,7 @@ def before_request():
         if user:
             cur.execute(sql.get_notifications_count(g.user))
             g.notifications = int(cur.fetchone().values()[0])
-            last_points_given_at = user["last_points_given_at"] or datetime.now()
+            last_points_given_at = user["last_points_given_at"]
             now = datetime.now()
             extra_points = extra_points_for_active(now, last_points_given_at)
             if extra_points > 0:
