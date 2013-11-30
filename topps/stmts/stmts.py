@@ -5,8 +5,8 @@ ei = lambda val: e(str(int(val)))
 
 # A decorator so we don't always have to do `print stmt; return stmt` at the end
 def print_and_return(func):
-    def pr_wrapper(*arg):
-        res = func(*arg)
+    def pr_wrapper(*arg, **kwargs):
+        res = func(*arg, **kwargs)
         print res
         return res
     return pr_wrapper
@@ -20,6 +20,10 @@ def get_user(user_id):
     return "SELECT * FROM users WHERE id={0} LIMIT 1;".format(ei(user_id))
 
 @print_and_return
+def get_other_users(user_id):
+    return "SELECT id, full_name FROM users WHERE id != {0}".format(ei(user_id))
+
+@print_and_return
 def after_login(user_id, extra_points):
     return "UPDATE users SET last_points_given_at=CURRENT_TIMESTAMP, points = points + {1} WHERE id = {0};".format(ei(user_id), ei(extra_points))
 
@@ -28,16 +32,33 @@ def populate_card(player_id):
     return "SELECT * FROM player WHERE id={0} LIMIT 1;".format(ei(player_id))
 
 @print_and_return
-def initiate_trade(user_id_1, user_id_2):
-    return "INSERT INTO trade (prop_id, accepter_id) VALUES ({0}, {1})".format(ei(user_id_1), ei(user_id_2))
+def select_trade(trade_id):
+    return "SELECT *, proposer.id, proposer.full_name FROM trade JOIN users AS proposer ON proposer.id=trade.prop_id LEFT OUTER JOIN users AS accepter ON accepter.id=accepter_id WHERE trade_id = {0}".format(ei(trade_id))
+
+@print_and_return
+def initiate_trade(user_id_1, user_id_2=None, last_edited=None):
+    #oh god.
+    if user_id_2:
+        if last_edited:
+            return "INSERT INTO trade (prop_id, accepter_id, last_edited) VALUES ({0}, {1}, {2})".format(ei(user_id_1), ei(user_id_2), ei(last_edited))
+        else:
+            return "INSERT INTO trade (prop_id, accepter_id) VALUES ({0}, {1})".format(ei(user_id_1), ei(user_id_2))
+    elif last_edited:
+        return "INSERT INTO trade (prop_id, last_edited) VALUES ({0}, {1})".format(ei(user_id_1), ei(last_edited))
+    else:
+        return "INSERT INTO trade (prop_id) VALUES ({0})".format(ei(user_id_1))
+
+@print_and_return
+def counter_trade(last_edited, trade_id):
+    return "UPDATE trade SET last_edited={0} WHERE trade_id={1};".format(ei(last_edited), ei(trade_id))
 
 @print_and_return
 def accept_trade(user_id_1, user_id_2):
     return "UPDATE trade SET accepted_at=CURRENT_TIMESTAMP WHERE prop_id={0} AND accepter_id={1}".format(ei(user_id_1), ei(user_id_2))
 
 @print_and_return
-def confirm_trade(user_id_1, user_id_2):
-    return "UPDATE trade SET confirmed_at=CURRENT_TIMESTAMP WHERE prop_id={0} AND accepter_id={1}".format(ei(user_id_1), ei(user_id_2))
+def confirm_trade(trade_id):
+    return "UPDATE trade SET confirmed_at=CURRENT_TIMESTAMP WHERE trade_id={0}".format(ei(trade_id))
 
 @print_and_return
 def cancel_trade(user_id_1, user_id_2):
@@ -61,12 +82,16 @@ def check_trades(user_id_1, user_id_2):
 
 @print_and_return
 def insert_trade_cards(trade_id, card_id, from_id, desired):
-    raw = "INSERT INTO `trade cards` (`trade_id` ,`card_id` ,`from_id` ,`desired`) VALUES ({0}, {1}, {2}, {3})"
+    raw = "INSERT INTO `trade_cards` (`trade_id` ,`card_id` ,`from_id` ,`desired`) VALUES ({0}, {1}, {2}, {3})"
     return raw.format(ei(trade_id), ei(card_id), ei(from_id), e(desired))
 
 @print_and_return
 def select_trade_cards(trade_id):
-    return "SELECT * FROM `trade cards` WHERE trade_id={0}".format(ei(trade_id))
+    return "SELECT * FROM `trade_cards` JOIN card JOIN player WHERE trade_cards.card_id=card.card_id AND player.id=card.player_id AND trade_id={0}".format(ei(trade_id))
+
+@print_and_return
+def remove_trade_cards(trade_id, card_id):
+    return "DELETE FROM `trade_cards` WHERE trade_id={0} AND card_id={1}".format(ei(trade_id), ei(card_id))
 
 @print_and_return
 def insert_pack(pack_name, points):

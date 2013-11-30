@@ -18,13 +18,12 @@
 		$(function() {
 
 			register("selected", function() {
-				var numSelected = $('.num-selected');
+				var numSelected = $('.propose-trade-button');
 				if (selected.length) {
-					numSelected.text(selected.length + ' selected');
-					numSelected.show();
+					numSelected.text('Add ' + selected.length + ' selected cards');
 				}
 				else 
-					numSelected.hide();
+					numSelected.text('Add cards');
 			});
 
 			var $window = $(window),
@@ -33,12 +32,11 @@
 
 			$('.propose-trade-button').on('click', function() {
 				if (selected.length == 0) {
-					alert('You must select cards to trade!');
+					alert('Select cards to add to trade proposal');
 				}
 				else {
-					post_to_url('/trade/propose/', {
-						cards: selected,
-						starting_with: page_user 
+					post_to_url('', {
+						cards: selected
 					});
 				}
 			});
@@ -91,7 +89,7 @@
 			<option value="conference" {% if sort=="conference" %}selected{%endif%}>Conference</option>
 		</select>
 	</div>
-	<button class="propose-trade-button">Propose a Trade</button>
+	<button class="propose-trade-button">Add Cards</button>
 	<span class="num-selected">1 card selected</span>
 	</div>
 </div>

@@ -1,0 +1,211 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='card.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='cards.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='propose.css') }}">
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='cards.js') }}"></script>
+<script>
+
+	selected = {
+		a: [],
+		b: []
+	}
+
+	{% if counter %}
+	var selection = false;
+	{% else %}
+	var selection = true;
+	{% endif %}
+
+	function toggleSelected(id, which) {
+
+		var index,
+			arr = which == "a" ? selected['a'] : selected['b'];
+
+		if ((index = arr.indexOf(id)) > -1)
+			arr.splice(index, 1);
+		else
+			arr.push(id);
+		trigger("selected:"+ which);
+	}
+
+	$(function() {
+		
+		$('.card').off("click");
+
+		clickHandler = function(which) {
+			return function() {
+				if (!selection)
+					return;
+				var id = $(this).attr('data-id');
+				$(this).toggleClass('selected');
+				toggleSelected(id, which);
+			}
+		}
+
+		$('.proposer .card').click(clickHandler("a"));
+		$('.accepter .card').click(clickHandler("b"));
+
+		var $a_remove = $('.proposer .remove-selected'),
+			$b_remove = $('.accepter .remove-selected');
+
+
+		register("selected:a", function() {
+			var $but = $a_remove,
+				arr = selected.a;
+
+			if (arr.length) {
+				$but.text('Remove '+ arr.length + " selected cards");
+				$but.show();
+			}
+			else {
+				$but.hide();
+			}
+
+		});
+
+		register("selected:b", function() {
+			var $but = $b_remove,
+				arr = selected.b;
+
+			if (arr.length) {
+				$but.text('Remove '+ arr.length + " selected cards");
+				$but.show();
+			}
+			else {
+				$but.hide();
+			}
+		});
+
+		$('.counter-offer').click(function() {
+			selection = true;
+			$('.counter-offer, .confirm').hide();
+			$('.add-cards').show();
+		});	
+
+		$('.proposer .remove-selected').on('click', function() {
+			post_to_url("{{ url_for('remove_cards_from_trade', trade_id=trade.trade_id) }}", {
+				cards: selected.a,
+			});
+		});
+
+		$('.accepter .remove-selected').on('click', function() {
+			post_to_url("{{ url_for('remove_cards_from_trade', trade_id=trade.trade_id) }}", {
+				cards: selected.b,
+			});
+		});
+	});
+</script>
+{% endblock %}
+
+{% block body %}
+
+{% set am_proposer = trade.prop_id|string() == g.user %}
+
+<div class="heading">
+	<div class="w">
+		<h1>Trade Proposal</h1>
+
+	
+		<div class="button-group">
+			{% if counter %}
+				<a class="button counter-offer">Counter Offer</a>
+				<a class="button confirm" href="{{ url_for('confirm_trade', trade_id=trade.trade_id) }}">Confirm Trade</a>
+			{% endif %}
+		</div>
+
+	</div>
+</div>
+
+<section class="proposer">
+	<div class="subheading">
+		{% if trade.prop_id %}
+			{% if trade.prop_id|string() == g.user %}
+				{% if trade.last_edited|string() != g.user %}
+				<h2 class="key">Cards {{ trade["accepter.full_name"] }} Wants From Me</h2>
+				{% else %}
+				<h2 class="key">Cards I'm Offering</h2>
+				{% endif %}
+			{% else %}
+				{% if trade.last_edited|string() != g.user %}
+				<h2 class="key">{{ trade["proposer.full_name"] }}'s Offering</h2>
+				{% else %}
+				<h2 class="key">Cards I Want from {{ trade["proposer.full_name"] }}</h2>
+				{% endif %}
+			{% endif %}
+		{% endif %}
+		{% if not trade.prop_id and am_proposer %}
+			<h2 class="key">Cards I Want</h2>
+		{% endif %}
+
+		
+	
+		<div class="button-group">
+			{% if trade.prop_id %}
+			<a class="button add-cards" style="{% if counter %}display: none;{% endif %}" href="{{ url_for('add_cards_to_trade', trade_id=trade.trade_id, user_id=trade.prop_id) }}">Add cards</a>
+			{% endif %}
+			<button class="remove-selected">Remove Cards</button>
+		</div>
+	</div>
+
+	<div class="cards-wrap"> 
+		<div class="cards">
+
+			{% set cards = grouped_cards[trade['proposer.id']|int()] %}			
+			{% include "_cards.html" %}
+
+		</div>
+
+	</div>
+</section>
+
+
+<section class="accepter">
+	<div class="subheading">
+		{% if trade.accepter_id %}
+			{% if trade.accepter_id|string() == g.user %}
+				{% if trade.last_edited|string() != g.user %}
+				<h2 class="key">Cards {{ trade["proposer.full_name"] }} Wants From Me</h2>
+				{% else %}
+				<h2 class="key">Cards I'm Offering</h2>
+				{% endif %}
+			{% else %}
+				{% if trade.last_edited|string() != g.user %}
+				<h2 class="key">{{ trade["accepter.full_name"] }}'s Offering</h2>
+				{% else %}
+				<h2 class="key">Cards I Want from {{ trade["accepter.full_name"] }}</h2>
+				{% endif %}
+			{% endif %}
+		{% endif %}
+		{% if not trade.accepter_id and am_proposer %}
+			<h2 class="key">Cards I Want</h2>
+		{% endif %}
+		</h2>
+
+		<div class="button-group">
+			
+			{% if trade.accepter_id %}
+			<a class="button add-cards" style="{% if counter %}display: none;{% endif %}" href="{{ url_for('add_cards_to_trade', trade_id=trade.trade_id, user_id=trade.accepter_id) }}">Add cards</a>
+			{% else %}
+			<a class="button">Find Cards</a>
+			{% endif %}
+			<button class="remove-selected">Remove Cards</button>
+		</div>
+	</div>
+
+	<div class="cards-wrap"> 
+		<div class="cards">
+
+			{% set cards = grouped_cards[trade['accepter.id']|int()] %}			
+			{% include "_cards.html" %}
+
+		</div>
+	</div>
+</section>
+
+
+{% endblock %}

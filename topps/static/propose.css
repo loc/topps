@@ -1,0 +1,18 @@
+.button-group, .button, button {
+	float: right;
+	margin: 0;
+	margin-left: 10px;
+}
+
+.key {
+	float: left;
+}
+
+.subheading {
+	overflow: hidden;
+}
+
+button.remove-selected {
+	display: none;
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ea2e2e), color-stop(100%,#af1111)); /* Chrome,Safari4+ */
+}

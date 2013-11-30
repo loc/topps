@@ -12,20 +12,60 @@
 	margin-top: 10px;
 }
 
+.no-card {
+	width: 220px;
+	height: 320px;
+	font-family: sans-serif;
+	-moz-border-radius: 9px;
+	border-radius: 9px;
+	box-sizing: border-box;
+	color: rgba(255, 255, 255, 0.3);
+	font-weight: 100;
+	border-radius: 9px;
+	border: 4px dashed;
+	text-align: center;
+	padding-top: 143px;
+}
+
 .num-selected {
 	display: none;
+	font-weight: 100;
+	font-family: "Open Sans";
+	float: right;
+	color: rgba(255, 255, 255, 0.5);
+	font-size: 15px;
+	margin-top: 11px;
+	margin-right: 14px;
 }
 
 .cards-wrap {
 	overflow: scroll;
+	clear: left;
+}
+
+.propose-trade-button {
+	float: right;
+	outline: none;
 }
 
 .heading {
-	width: 980px;
-	margin: 0 auto;
+	width: 100%;
 	color: white;
 	margin-top: 25px;
 	margin-bottom: 10px;
+	background: #292929;
+	padding: 10px;
+	box-sizing: border-box;
+}
+
+.heading.fixed {
+	position: fixed;
+	top: 0;
+	z-index: 20;
+	margin: 0;
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.5);
+	background: #202020;
+	border-top: 4px solid #2c72b3;
 }
 
 .heading h1 {
@@ -34,11 +74,14 @@
 	font-size: 23px;
 	margin: 0;
 	display: inline;
+	float: left;
+	margin-top: 3px;
 }
 
 .subheading {
 	width: 980px;
 	margin: 0 auto;
+	padding: 15px 0;
 }
 .subheading .key {
 	margin: 0;
@@ -46,6 +89,7 @@
 	color: rgba(255, 255, 255, 0.29);
 	font-size: 20px;
 	padding-top: 10px;
+	display: inline;
 }
 
 .sort-by {
@@ -60,6 +104,8 @@
 	margin-left: 10px;
 	top: -3px;
 	color: rgba(255,255,255,.5);
+	float: left;
+	margin-top: 10px;
 }
 
 .sort-by:after {
@@ -95,6 +141,7 @@
 
 section {
 	padding-bottom: 10px;
+	clear: left;
 }
 
 section:nth-child(2n) {

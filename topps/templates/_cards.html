@@ -1,0 +1,36 @@
+
+{% if cards|length %}
+	{% for card in cards %}
+
+		<div class="card" data-id="{{ card.card_id }}">
+			<div class="side front">
+				<img src="{{card.image_url}}">
+				<div class="caption">
+					<span class="title">{{ card.first_name}} {{card.last_name}} <span class="position">{{card.position}}</span></span>
+					<span class="subtitle">{{card.team_name}}</span>
+				</div>
+				<span class="flip">flip</span>
+			</div>
+
+			<div class="side back">
+				<div class="heading">
+					<img class="image-box">
+					<div class="title">{{card.first_name}} {{card.last_name}}</div>
+					<div class="subtitle">{{card.team_name}}</div>
+				</div>
+				<div class="stats">
+					Number: {{card.number}}
+					Position: {{card.position}}
+				</div>
+				<span class="flip">flip</span>
+
+			</div>
+		</div>
+
+	{% endfor %}
+
+{% else %}
+	<div class="no-card">
+		No cards here
+	</div>
+{% endif %}

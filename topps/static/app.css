@@ -9,11 +9,34 @@ body > header {
 	background: #2c72b3;
 	border-top: 1px solid #4e89bf;
 	border-bottom: 5px solid #2064a2;
-	padding: 10px 0;
 	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
 }
 
-header .w {
+.w {
 	width: 980px;
 	margin: 0 auto;
+}
+
+header .logo {
+	padding: 10px 0;
+}
+
+button, .button {
+	background: #2C72B3;
+	border: 1px solid #03182C;
+	padding: 10px 20px;
+	border-radius: 3px;
+	box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.5);
+	color: #FFF;
+	text-shadow: none;
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#327BC9), color-stop(100%,#1167B2));
+	font-size: 13px;
+	font-weight: 100;
+	font-family: Open Sans;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.confirm {
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#15a81a), color-stop(100%,#11871b)); /* Chrome,Safari4+ */
 }
