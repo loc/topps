@@ -4,11 +4,11 @@ from lxml.etree import HTML
 from lxml import html
 from lxml.cssselect import CSSSelector as css
 from urlparse import urljoin
-from topps import app
+from topps import scraper
 from math import floor
 from topps import util
 
-db = util.connect_db()
+db = util.connect_db(scraper)
 
 cursor = db.cursor()
 

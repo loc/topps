@@ -1,25 +1,38 @@
 from topps import app
+<<<<<<< HEAD
 from flask import Flask, request, session, g, render_template, redirect, url_for, jsonify, json, make_response
+=======
+
+from flask import Flask, request, session, g, render_template, redirect, url_for
+>>>>>>> 2b3db41c66f1b8507c892598895a2afb4826a113
 # stmts does escaping internally
 from stmts import stmts as sql
 from util import *
 import urllib
 from datetime import datetime
 from pprint import pprint
+from MySQLdb import IntegrityError
+
+app.jinja_env.filters['pretty_date'] = pretty_date
 
 @app.before_request
 def before_request():
     if '/static/' in request.path:
         return
-    g.db = connect_db()
+    g.db = connect_db(app)
     g.user = session['user'] if 'user' in session else None
+    g.notifications, g.points, g.is_admin = None, None, None
     if g.user:
         cur = g.db.cursor()
         cur.execute(sql.get_user(g.user))
         user = cur.fetchone()
         if user:
             g.user_record = user
+            cur.execute(sql.get_notifications_count(g.user))
+            g.notifications = int(cur.fetchone().values()[0])
             last_points_given_at = user["last_points_given_at"]
+            g.points = user["points"]
+            g.is_admin = user["is_admin"]
             now = datetime.now()
             extra_points = extra_points_for_active(now, last_points_given_at)
             if extra_points > 0:
@@ -39,14 +52,7 @@ def secret():
 
 @app.route('/')
 def index():
-    cur = g.db.cursor()
-    cur.execute(sql.get_user(g.user))
-    user = cur.fetchone()
-    
-    cur = g.db.cursor()
-    cur.execute("SELECT * FROM users")
-    rows = cur.fetchall()
-    return render_template("example.html", rows=rows, user=user)
+    return redirect(url_for('cards'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -60,6 +66,7 @@ def login():
         print results
         if len(results) == 1:
             session['user'] = str(results[0]["id"])
+            session['is_admin'] = str(results[0]["is_admin"])
             # After_login logic
             return redirect(redirect_url())
         # error("couldn't log you in")
@@ -72,19 +79,46 @@ def logout():
     session.pop("user")
     return redirect(url_for('index'))
 
+@app.route('/active')
+@login_required
+def active_trades():
+    cur = g.db.cursor()
+    cur.execute(sql.get_active_trades(g.user))
+    trades = cur.fetchall()
+
+    return render_template("active_trades.html", trades=trades)
+
 
 @app.route('/cards/')
 @app.route('/cards/<int:id>')
 @app.route('/cards/<int:id>/sort/<string:sort>')
 @app.route('/cards/sort/<string:sort>')
 @login_required
-def cards(id=None, sort="team"):
+def cards(id=None, sort=None):
     if not id:
         id=g.user
 
-    user, cards_sorted, is_my_own = cards_logic(id, sort)
+    if sort:
+        user, cards_sorted, is_my_own = cards_logic(id, sort)
+        cards = None 
+    else:
+        cur = g.db.cursor()
+        cur.execute(sql.get_user_cards(id))
+        cards = cur.fetchall()
 
-    return render_template("cards.html", sorted=cards_sorted, user=user, is_my_own=is_my_own, sort=sort)
+        cur.execute(sql.get_user(id))
+        user = cur.fetchone()
+
+        for i, card in enumerate(cards):
+            cards[i]["image_url"] = urllib.unquote(card['image_url'])
+
+        cards_sorted = None
+        is_my_own = False
+        if int(g.user) == int(user['id']):
+            is_my_own = True
+
+
+    return render_template("cards.html", cards=cards, sorted=cards_sorted, user=user, is_my_own=is_my_own, sort=sort)
 
 def cards_logic(id, sort):
     cur = g.db.cursor()
@@ -97,7 +131,6 @@ def cards_logic(id, sort):
     is_my_own = False
     if int(g.user) == int(user['id']):
         is_my_own = True
-
 
     for i, card in enumerate(cards):
         cards[i]["image_url"] = urllib.unquote(card['image_url'])
@@ -183,12 +216,21 @@ def add_cards_to_trade(trade_id, user_id, sort="team"):
         return
 
     if request.method == "POST":
+
+        if not trade['accepter_id']:
+            cur.execute(sql.propose_trade(trade_id, user_id))
+
         cards = request.form['cards'].split(',')
         if len(cards):
             for id in cards:
-                cur.execute(sql.insert_trade_cards(trade_id, id, user_id, "0"))
+                try:
+                    cur.execute(sql.insert_trade_cards(trade_id, id, user_id, "0"))
+                except IntegrityError:
+                    pass
+                g.db.commit()       
+
         cur.execute(sql.counter_trade(g.user, trade_id))
-        g.db.commit()
+        
         return redirect(url_for('propose_trade', trade_id=trade_id))
 
     user, cards_sorted, is_my_own = cards_logic(user_id, sort)
@@ -228,7 +270,6 @@ def confirm_trade(trade_id):
             cur.execute(sql.trade_card(card['card_id'], g.user))
 
     g.db.commit() 
-    print "trade success"
 
     return redirect(url_for('cards'))
 

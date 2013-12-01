@@ -1,11 +1,11 @@
 import requests
-from topps import app, util
+from topps import scraper, util
 import urllib
 
 api_key = "AIzaSyCLwU-GzxT2dNPJb_MVN9siT2XDt9i6PVU"
 cx = "000360205876112400002:4wuw1ts2yh4"
 
-db = util.connect_db()
+db = util.connect_db(scraper)
 cursor = db.cursor()
 
 def url(q):

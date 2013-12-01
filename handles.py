@@ -1,9 +1,9 @@
 import twitter
 from operator import attrgetter
-from topps import app, util
+from topps import scraper, util
 import urllib
 
-db = util.connect_db()
+db = util.connect_db(scraper)
 cursor = db.cursor()
 
 api = twitter.Api(consumer_key="OytewwBIEg49pI75p4rxng", \

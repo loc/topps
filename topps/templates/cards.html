@@ -14,7 +14,7 @@
 	</script>
 
 	<script>
-	
+
 		$(function() {
 
 			register("selected", function() {
@@ -57,7 +57,10 @@
 
 			$('.sort-by-select').change(function() {
 				$('.sort-type').text($(this).val());
-				if (/sort\/[a-zA-Z]+/.test(window.location.href)) {
+				if ($(this).val() == "") {
+					window.location.href = window.location.href.replace(/sort\/[a-zA-Z]+/, "");
+				}
+				else if (/sort\/[a-zA-Z]+/.test(window.location.href)) {
 					window.location.href = window.location.href.replace(/sort\/[a-zA-Z]+/, "sort/" + $(this).val());
 				}
 				else {
@@ -85,7 +88,8 @@
 		<span>Sort by:</span>
 		<span class="sort-type">{{ sort }}</span>
 		<select class="sort-by-select">
-			<option value="team">Team</option>
+			<option value="" {% if not sort %}selected{%endif%}>None</option>
+			<option value="team" {% if sort=="team" %}selected{%endif%}>Team</option>
 			<option value="position" {% if sort=="position" %}selected{%endif%}>Position</option>
 			<option value="division" {% if sort=="division" %}selected{%endif%}>Division</option>
 			<option value="conference" {% if sort=="conference" %}selected{%endif%}>Conference</option>
@@ -96,21 +100,30 @@
 	</div>
 </div>
 
+{% if sort %}
 
-{% for key, cards in sorted.cards.items() %}
+	{% for key, cards in sorted.cards.items() %}
 
-	
-	<section>
-		<div class="subheading">
-			<h2 class="key">{{key}}</h2>	
-		</div>
-		<div class="cards-wrap"> 
-			<div class="cards">
-
-				{% include "_cards.html" %}
-
+		
+		<section class="cf">
+			<div class="subheading">
+				<h2 class="key">{{key}}</h2>	
 			</div>
-		</div>
-	</section>
-{% endfor %}
+			<div class="cards-wrap"> 
+				<div class="cards">
+
+					{% include "_cards.html" %}
+
+				</div>
+			</div>
+		</section>
+	{% endfor %}
+{% else %}
+
+	<div class="cards-list">
+
+		{% include "_cards.html" %}
+
+	</div>
+{% endif %}
 {% endblock %}
