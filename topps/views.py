@@ -18,6 +18,7 @@ def before_request():
         cur.execute(sql.get_user(g.user))
         user = cur.fetchone()
         if user:
+            g.user_record = user
             last_points_given_at = user["last_points_given_at"] or datetime.now()
             now = datetime.now()
             extra_points = extra_points_for_active(now, last_points_given_at)
@@ -322,7 +323,9 @@ def register():
 	else:
 		return render_template("register.html")
 
+
 @app.route('/export.json', methods=['GET', 'POST'])
+@admin_required
 def export():
 	status_text = None
 	export = {}
@@ -378,7 +381,7 @@ def export():
 	for trade_cards_row in cur.fetchall():
 		export['trade_cards'].append(trade_cards_row)
 
-	json_result = json.dumps(export)
+	json_result = json.dumps(export, indent=2)
 	response = make_response(json_result)
 	response.headers['Content-Disposition']="attachment;filename=export.json"
 	response.headers['Content-Type']="application/json"
