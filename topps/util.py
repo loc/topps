@@ -3,8 +3,9 @@ import MySQLdb.cursors
 from topps import app
 from flask import g, redirect, url_for, request
 from functools import wraps
-from datetime import timedelta
+from datetime import timedelta, datetime
 from collections import defaultdict
+import json
 
 def connect_db(app):
     return mysql.connect(host=app.config["HOST"], db=app.config["DATABASE"], user=app.config["USERNAME"], passwd=app.config["PASSWORD"], cursorclass=mysql.cursors.DictCursor)
@@ -103,3 +104,13 @@ def card_sort(cards, sort):
         #print card[key]
         obj[card[key]].append(card)
     return obj
+
+
+def json_encode(structure):
+    class custom_encoder(json.JSONEncoder):
+        def default(self, object):
+            if isinstance(object, datetime):
+                return object.isoformat()
+            else:
+                return json.JSONEncoder.default(self, object)
+    return json.dumps(structure, cls=custom_encoder, indent=2 )

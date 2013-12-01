@@ -1,7 +1,6 @@
 from topps import app
 
 from flask import Flask, request, session, g, render_template, redirect, url_for
-import json
 # stmts does escaping internally
 from stmts import stmts as sql
 from util import *
@@ -403,7 +402,7 @@ def export():
 	for trade_cards_row in cur.fetchall():
 		export['trade_cards'].append(trade_cards_row)
 
-	json_result = json.dumps(export, indent=2)
+	json_result = json_encode(export)
 	response = make_response(json_result)
 	response.headers['Content-Disposition']="attachment;filename=export.json"
 	response.headers['Content-Type']="application/json"
