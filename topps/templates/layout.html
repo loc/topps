@@ -42,7 +42,7 @@
 				<div class="account dropdown">
 					<span class="label">Account</span>
 					<ul class="flyout">
-						<li><a href="#">Active Trades {% if g.notifications > 0 %}<span class="notify">{{g.notifications }}</span>{% endif %}</a></li>
+						<li><a href="{{ url_for('active_trades') }}">Active Trades {% if g.notifications > 0 %}<span class="notify">{{g.notifications }}</span>{% endif %}</a></li>
 						<li><a href="{{ url_for('logout') }}">Logout</a></li>
 					</ul>
 				</div>
