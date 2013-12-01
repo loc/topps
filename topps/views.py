@@ -323,6 +323,7 @@ def register():
 		return render_template("register.html")
 
 @app.route('/export.json', methods=['GET', 'POST'])
+@admin_required
 def export():
 	status_text = None
 	export = {}
@@ -378,7 +379,7 @@ def export():
 	for trade_cards_row in cur.fetchall():
 		export['trade_cards'].append(trade_cards_row)
 
-	json_result = json.dumps(export)
+	json_result = json.dumps(export, indent=2)
 	response = make_response(json_result)
 	response.headers['Content-Disposition']="attachment;filename=export.json"
 	response.headers['Content-Type']="application/json"
