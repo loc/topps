@@ -23,9 +23,9 @@ def admin_required(func):
         if g.user is None or g.user_record is None:
             return redirect(url_for('login', next=request.url))
         elif not g.user_record["is_admin"]:
-            return redirecT(url_for('cards'))
+            return redirect(url_for('cards'))
         else:
-            return funct(*args, **kwargs)
+            return func(*args, **kwargs)
     return decorated_function
 
 def redirect_url(default='index'):
