@@ -17,7 +17,7 @@ def before_request():
         return
     g.db = connect_db(app)
     g.user = session['user'] if 'user' in session else None
-    g.notifications = None
+    g.notifications, g.points, g.is_admin = None, None, None
     if g.user:
         cur = g.db.cursor()
         cur.execute(sql.get_user(g.user))
@@ -26,6 +26,8 @@ def before_request():
             cur.execute(sql.get_notifications_count(g.user))
             g.notifications = int(cur.fetchone().values()[0])
             last_points_given_at = user["last_points_given_at"]
+            g.points = user["points"]
+            g.is_admin = user["is_admin"]
             now = datetime.now()
             extra_points = extra_points_for_active(now, last_points_given_at)
             if extra_points > 0:
@@ -59,6 +61,7 @@ def login():
         print results
         if len(results) == 1:
             session['user'] = str(results[0]["id"])
+            session['is_admin'] = str(results[0]["is_admin"])
             # After_login logic
             return redirect(redirect_url())
         # error("couldn't log you in")

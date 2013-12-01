@@ -115,7 +115,7 @@ header .dropdown:before {
 	position: relative;
 }
 
-.flyout li a {
+.flyout li a, .flyout li > span {
 	color: white;
 	padding: 8px 22px;
 	text-decoration: none;
