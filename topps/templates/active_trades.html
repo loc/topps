@@ -22,6 +22,7 @@
 			<th>Started</th>
 			<th>Action</th>
 			<th></th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -41,6 +42,7 @@
 			</td>
 
 			<td><a href="{{ url_for('propose_trade', trade_id=trade.trade_id) }}">Review</a></td>
+			<td><a href="{{ url_for('cancel_trade', trade_id=trade.trade_id) }}">Cancel</a></td>
 			
 			
 		</tr>

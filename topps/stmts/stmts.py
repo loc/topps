@@ -75,8 +75,8 @@ def confirm_trade(trade_id):
     return "UPDATE trade SET confirmed_at=CURRENT_TIMESTAMP WHERE trade_id={0}".format(ei(trade_id))
 
 @print_and_return
-def cancel_trade(user_id_1, user_id_2):
-    return "DELETE FROM trade WHERE prop_id={0} AND accepter_id={1}".format(ei(user_id_1), ei(user_id_2))
+def cancel_trade(trade_id):
+    return "DELETE FROM trade WHERE trade_id={0}".format(ei(trade_id))
 
 @print_and_return
 def select_card(card_id):

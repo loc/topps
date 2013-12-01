@@ -269,10 +269,10 @@ def confirm_trade(trade_id):
     return redirect(url_for('cards'))
 
 
-@app.route('/trade/cancel', methods=['GET', 'POST'])
-def cancel_trade(other_user_id):
+@app.route('/trade/cancel/<int:trade_id>', methods=['GET', 'POST'])
+def cancel_trade(trade_id):
     cur = g.db.cursor()
-    cur.execute(sql.cancel_trade(g.user,other_user_id))
+    cur.execute(sql.cancel_trade(trade_id))
     g.db.commit()
     return render_template("status.html", status_text="trade canceled")
 
