@@ -17,6 +17,17 @@ def login_required(func):
         return func(*args, **kwargs)
     return decorated_function
 
+def admin_required(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        if g.user is None or g.user_record is None:
+            return redirect(url_for('login', next=request.url))
+        elif not g.user_record["is_admin"]:
+            return redirect(url_for('cards'))
+        else:
+            return func(*args, **kwargs)
+    return decorated_function
+
 def redirect_url(default='index'):
     return request.args.get('next') or \
            request.referrer or \

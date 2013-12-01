@@ -145,3 +145,44 @@ def register_user(email, full_name, password):
 @print_and_return
 def check_registered(email):
     return """SELECT id FROM users WHERE email="{0}";""".format(e(email))
+
+@print_and_return
+def get_users():
+    return """SELECT * FROM users;"""
+
+@print_and_return
+def get_card():
+    return """SELECT * FROM card;"""
+
+@print_and_return
+def get_conference():
+    return """SELECT * FROM conference;"""
+
+@print_and_return
+def get_division():
+    return """SELECT * FROM division;"""
+
+@print_and_return
+def get_packs_players():
+    return """SELECT * FROM packs_players;"""
+
+@print_and_return
+def get_player():
+    return """SELECT * FROM player;"""
+
+@print_and_return
+def get_team():
+    return """SELECT * FROM team;"""
+
+@print_and_return
+def get_trade():
+    return """SELECT * FROM trade;"""
+
+@print_and_return
+def get_trade_cards():
+     return """SELECT * FROM trade_cards;"""
+
+
+
+
+	
