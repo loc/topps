@@ -296,7 +296,7 @@ def purchase(pack_id):
         g.db.commit()
     else:
         return render_template("status.html", status_text="you dont have enough pts")       
-    return render_template("status.html", status_text="purchase complete")     
+    return redirect(url_for('cards'))    
     # cur.execute(sql.get_pack(pack_id))
     # results = cur.fetchall()
     # #print results
