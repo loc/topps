@@ -93,19 +93,17 @@ def cards(id=None, sort=None):
     if not id:
         id=g.user
 
+    cur = g.db.cursor()
+
     if sort:
         user, cards_sorted, is_my_own = cards_logic(id, sort)
         cards = None 
     else:
-        cur = g.db.cursor()
         cur.execute(sql.get_user_cards(id))
         cards = cur.fetchall()
 
         cur.execute(sql.get_user(id))
         user = cur.fetchone()
-
-        cur.execute(sql.get_packs());
-        packs = cur.fetchall();
 
         for i, card in enumerate(cards):
             cards[i]["image_url"] = urllib.unquote(card['image_url'])
@@ -115,6 +113,8 @@ def cards(id=None, sort=None):
         if int(g.user) == int(user['id']):
             is_my_own = True
 
+    cur.execute(sql.get_packs());
+    packs = cur.fetchall();
 
     return render_template("cards.html", cards=cards, sorted=cards_sorted, user=user, is_my_own=is_my_own, sort=sort, packs=packs)
 
