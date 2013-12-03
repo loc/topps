@@ -84,7 +84,6 @@ header .dropdown:before {
 	-webkit-transform: scaleY(.6);
 	-moz-transform: scaleY(.6);
 	right: 0;
-
 }
 
 .dropdown .flyout {
@@ -169,8 +168,12 @@ header .dropdown:before {
 	position: absolute;
 }
 
-.confirm {
+.confirm, .buy-pack {
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#15a81a), color-stop(100%,#11871b)); /* Chrome,Safari4+ */
+}
+
+.button-drop {
+	
 }
 
 .cf:before,

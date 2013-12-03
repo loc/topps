@@ -82,6 +82,66 @@
 	margin-top: 3px;
 }
 
+.buy-pack {
+	float: right;
+
+}
+
+button .drop {
+	width: 35px;
+	display: block;
+	height: 38px;
+	float: left;
+	border-left: 1px solid rgba(0, 0, 0, 0.07);
+	position: relative;
+
+}
+
+button .drop:after {
+	content: "";
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	position: absolute;
+	border-left: 1px solid rgba(255,255,255,.15);
+}
+
+.buy-pack-select {
+	border-left: 1px solid rgba(0, 0, 0, 0.15);
+	background: white;
+	opacity: 0;
+	cursor: pointer;
+	position: absolute;
+	right: 0;
+	width: 35px;
+	height: 38px;
+	display: block;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	opacity: 0;
+}
+
+.button-drop {
+	padding: 0;
+	margin: 2px;
+	height: 40px;
+	margin-left: 10px;
+}
+
+.button-drop .label {
+	float: left;
+	padding: 10px 15px;
+}
+
+.button-drop .drop {
+	background: url('/static/images/arrow.png');
+	background-repeat: no-repeat;
+	background-position: center center;
+
+
+}
+
 .subheading {
 	width: 980px;
 	margin: 0 auto;

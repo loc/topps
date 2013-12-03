@@ -104,6 +104,9 @@ def cards(id=None, sort=None):
         cur.execute(sql.get_user(id))
         user = cur.fetchone()
 
+        cur.execute(sql.get_packs());
+        packs = cur.fetchall();
+
         for i, card in enumerate(cards):
             cards[i]["image_url"] = urllib.unquote(card['image_url'])
 
@@ -113,7 +116,7 @@ def cards(id=None, sort=None):
             is_my_own = True
 
 
-    return render_template("cards.html", cards=cards, sorted=cards_sorted, user=user, is_my_own=is_my_own, sort=sort)
+    return render_template("cards.html", cards=cards, sorted=cards_sorted, user=user, is_my_own=is_my_own, sort=sort, packs=packs)
 
 def cards_logic(id, sort):
     cur = g.db.cursor()
@@ -293,7 +296,7 @@ def purchase(pack_id):
         g.db.commit()
     else:
         return render_template("status.html", status_text="you dont have enough pts")       
-    return render_template("status.html", status_text="trade complete")     
+    return render_template("status.html", status_text="purchase complete")     
     # cur.execute(sql.get_pack(pack_id))
     # results = cur.fetchall()
     # #print results

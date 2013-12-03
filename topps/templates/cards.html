@@ -55,6 +55,27 @@
 				}
 			});
 
+			$('.buy-pack-select').change(function() {
+				if ($(this).val() === "") {
+					$('.buy-pack .label').text("Buy Pack");
+				}
+				else {
+					var $ele = $(this).find('option[value="' +  $(this).val() +  '"]');
+					$('.buy-pack .label').text("Buy \"" + $ele.text() + "\" for " + $ele.attr('data-points') + " pts.");
+				}
+				
+			});
+
+			$('.buy-pack .label').click(function() {
+				if ($('.buy-pack-select').val() === "") {
+					alert("You must select a card pack to purchase!");
+					return;
+				}
+				else {
+					window.location.href = "/purchase/" + $('.buy-pack-select').val();
+				}
+			});
+
 			$('.sort-by-select').change(function() {
 				$('.sort-type').text($(this).val());
 				if ($(this).val() == "") {
@@ -95,8 +116,18 @@
 			<option value="conference" {% if sort=="conference" %}selected{%endif%}>Conference</option>
 		</select>
 	</div>
+	<button class="buy-pack button-drop"><span class="label">Buy Cards</span><span class="drop"></span>
+	
+	</button>
+	<select class="buy-pack-select">
+		<option></option>
+		{% for pack in packs %}
+			<option value="{{ pack.pack_id }}" data-points="{{ pack.points|int() }}" {% if pack.points > g.points %}disabled{% endif %}>{{ pack.name }}</option>
+		{% endfor %}
+	</select>
 	<button class="propose-trade-button">Propose a Trade</button>
 	<span class="num-selected">1 card selected</span>
+
 	</div>
 </div>
 

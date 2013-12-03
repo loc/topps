@@ -123,16 +123,21 @@
 	padding-top: 3px;
 }
 .back .title {
-	position: absolute
-	padding-top: 200px;
-	line-height: 3em;
-	font-weight: bold;
+	padding-left: 17px;
+	margin-bottom: 0;
+	margin-top: 20px;
 	font-size: 20px;
 }
+.back .twitter {
+	padding-left: 17px;
+color: rgba(0, 0, 0, 0.5);
+font-size: 14px;
+}
 .back .subtitle {
-	position: absolute
+	padding-left: 17px;
 	font-style: italic;
-	font-size: 10px;
+	font-size: 13px;
+	margin-top: 5px;
 }
 .back .stats {
 	width:300px;

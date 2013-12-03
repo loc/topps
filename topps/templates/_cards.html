@@ -13,15 +13,13 @@
 			</div>
 
 			<div class="side back">
-				<div class="heading">
-					<img class="image-box">
-					<div class="title">{{card.first_name}} {{card.last_name}}</div>
-					<div class="subtitle">{{card.team_name}}</div>
-				</div>
-				<div class="stats">
-					Number: {{card.number}}
-					Position: {{card.position}}
-				</div>
+				<div class="title">{{card.first_name}} {{card.last_name}}</div>
+				<div class="twitter">@{{card.twitter}}</div>
+				<div class="subtitle">{{card.team_name}}</div>
+				<ul class="stats">
+					<li>Number: {{card.number}}</li>
+					<li>Position: {{card.position}}</li>
+				</ul>
 				<span class="flip">flip</span>
 
 			</div>
