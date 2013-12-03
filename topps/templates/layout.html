@@ -28,6 +28,10 @@
 		    document.body.appendChild(form);
 		    form.submit();
 		}
+
+		if (~navigator.userAgent.indexOf("MSIE")) {
+			alert('Please use a real browser like Google Chrome');
+		}
 	</script>
 	{% block js %}{% endblock %}
 </head>
